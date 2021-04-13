@@ -34,6 +34,6 @@ class ClientEcho {
 public class Client {
     public static void main(String[] args) throws SocketException, UnknownHostException {
         ClientEcho cli = new ClientEcho();
-        cli.sendEcho("A Woody não sabe merda nenhuma de CC. Ja parece o Rufus");
+        cli.sendEcho("Teste");
     }
 }
