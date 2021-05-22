@@ -5,14 +5,12 @@ import java.nio.ByteBuffer;
 import java.util.Arrays;
 
 public class Packet implements Serializable {
-
-    private int tipo;
+    private int tipo; // 1-pedir ficheiro | 2-enviar ficherio | 3-ficheiro nao existe | 4-FFS ligou | 5-Keep Alive
     private String ipDestino;
     private int porta;
     private int idTransferencia;
     private int chucnkTransferencia;
     private byte[] data;
-
 
     public Packet (int tipo, String ipDestino, int porta, int idTransferencia, int chucnkTransferencia, byte[] data) {
         this.tipo = tipo;
@@ -22,7 +20,6 @@ public class Packet implements Serializable {
         this.chucnkTransferencia = chucnkTransferencia;
         this.data = data;
     }
-
 
     public Packet (byte[] arrayBytes) throws UnknownHostException {
         byte[] auxiliar = new byte[4];
@@ -98,5 +95,9 @@ public class Packet implements Serializable {
 
     public int getChucnkTransferencia() {
         return chucnkTransferencia;
+    }
+
+    public String getData() {
+        return data.toString();
     }
 }

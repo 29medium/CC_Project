@@ -24,10 +24,16 @@ class PacketQueue {
     public Packet remove() {
         lock.lock();
         try {
-            if(packets.isEmpty())
-                return null;
-            else
-                return packets.remove();
+            return packets.remove();
+        } finally {
+            lock.unlock();
+        }
+    }
+
+    public boolean isEmpty() {
+        lock.lock();
+        try {
+            return packets.isEmpty();
         } finally {
             lock.unlock();
         }

@@ -4,11 +4,9 @@ import java.net.DatagramSocket;
 
 public class ReceiverGateway implements Runnable {
     private DatagramSocket ds;
-    private DataOutputStream out;
 
-    public ReceiverGateway(DatagramSocket ds, DataOutputStream out){
+    public ReceiverGateway(DatagramSocket ds){
         this.ds = ds;
-        this.out = out;
     }
 
     public void run() {
@@ -17,7 +15,11 @@ public class ReceiverGateway implements Runnable {
             DatagramPacket packet = new DatagramPacket(buf, buf.length);
             ds.receive(packet);
             Packet p = new Packet(buf);
-            System.out.println(p.toString());
+
+            // System.out.println(p.toString());
+
+            // Verificar o tipo de pacote de regresso e o utilizador a quem este se refere
+            // Dar output ao utilizador através do map guardado no userset
         } catch (Exception ignored) {}
     }
 }

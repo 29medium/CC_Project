@@ -8,14 +8,24 @@ public class Gateway {
         ServerSocket ss = new ServerSocket(80);
         DatagramSocket ds = new DatagramSocket(88);
 
-        ServerSet servers = new ServerSet();
+        ServerList servers = new ServerList();
+        UserList users = new UserList();
+        int userCounter=0; // cada user vai ter um id para guardar na userlist
+
+        // Criar aqui uma thread para o keep alive
+
+        // Thread para receber do FFS
+        Thread receiver = new Thread(new ReceiverGateway(ds));
+        receiver.start();
 
         while(true) {
             Socket s = ss.accept();
-	    System.out.println("Entrou");
 
-            Thread userHandler = new Thread(new UserHandler(ds, s, servers));
-            userHandler.start();
+            users.addSocket(userCounter++,s);
+
+            // Thread para enviar para o FFS (1 por cliente)
+            Thread sender = new Thread(new SenderGateway(ds, s, servers));
+            sender.start();
         }
     }
 }

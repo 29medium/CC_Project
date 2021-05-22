@@ -15,8 +15,10 @@ class SenderFFS implements Runnable {
     public void run() {
         while(true) {
             try {
-                Packet p = pq.remove();
-                if(p!=null) {
+                // Deviamos trocar o facto de estar vazio para uma condition para nao termos uma espera ativa
+                if(!pq.isEmpty()) {
+                    Packet p = pq.remove();
+
                     byte[] buf = p.packetToBytes();
                     DatagramPacket dp = new DatagramPacket(buf, buf.length, InetAddress.getByName("10.1.1.1"), 88);
 
