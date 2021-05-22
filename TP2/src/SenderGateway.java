@@ -16,9 +16,10 @@ class SenderGateway implements Runnable {
 
     public void run() {
         try {
-            Packet p = new Packet(1, "abc", 88, 1, 1, "Cona".getBytes(StandardCharsets.UTF_8));
+            Packet p = new Packet(1, "10.1.1.2", 88, 1, 1, "Cona".getBytes(StandardCharsets.UTF_8));
             byte[] buf = p.packetToBytes();
-            DatagramPacket packet = new DatagramPacket(buf, buf.length, InetAddress.getByName("localhost"), 88);
+            DatagramPacket packet = new DatagramPacket(buf, buf.length, InetAddress.getByName(p.getIpDestino()),88);
+	    System.out.println(p.toString());
 
             ds.send(packet);
         } catch (IOException ignored) {}
