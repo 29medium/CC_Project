@@ -1,5 +1,3 @@
-package FFServer;
-
 import java.net.DatagramPacket;
 import java.util.LinkedList;
 import java.util.Queue;

@@ -1,5 +1,3 @@
-package Gateway;
-
 import java.io.*;
 import java.net.DatagramSocket;
 import java.net.Socket;

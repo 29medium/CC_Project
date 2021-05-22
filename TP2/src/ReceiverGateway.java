@@ -1,5 +1,3 @@
-package Gateway;
-
 import java.io.DataOutputStream;
 import java.net.DatagramPacket;
 import java.net.DatagramSocket;
