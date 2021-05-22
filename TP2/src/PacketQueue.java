@@ -4,7 +4,7 @@ import java.util.Queue;
 import java.util.concurrent.locks.ReentrantLock;
 
 class PacketQueue {
-    private Queue<DatagramPacket> packets;
+    private Queue<Packet> packets;
     private ReentrantLock lock;
 
     public PacketQueue() {
@@ -12,7 +12,7 @@ class PacketQueue {
         lock = new ReentrantLock();
     }
 
-    public void add(DatagramPacket packet) {
+    public void add(Packet packet) {
         lock.lock();
         try {
             packets.add(packet);
@@ -21,10 +21,13 @@ class PacketQueue {
         }
     }
 
-    public DatagramPacket remove() {
+    public Packet remove() {
         lock.lock();
         try {
-            return packets.remove();
+            if(packets.isEmpty())
+                return null;
+            else
+                return packets.remove();
         } finally {
             lock.unlock();
         }

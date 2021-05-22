@@ -8,5 +8,8 @@ public class FFServer {
 
         Thread receiver = new Thread(new ReceiverFFS(ds, pq));
         Thread sender = new Thread(new SenderFFS(ds, pq));
+
+        receiver.start();
+        sender.start();
     }
 }

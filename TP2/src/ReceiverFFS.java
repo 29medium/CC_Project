@@ -17,7 +17,8 @@ class ReceiverFFS implements Runnable {
                 byte[] arr = new byte[1000];
                 DatagramPacket dp = new DatagramPacket(arr, arr.length);
                 ds.receive(dp);
-                pq.add(dp);
+                Packet p = new Packet(arr);
+                pq.add(p);
             } catch (IOException ignored) {}
         }
     }

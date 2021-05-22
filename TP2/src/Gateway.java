@@ -13,8 +13,6 @@ public class Gateway {
         while(true) {
             Socket s = ss.accept();
 
-            System.out.println("Entrou");
-
             Thread userHandler = new Thread(new UserHandler(ds, s, servers));
             userHandler.start();
         }

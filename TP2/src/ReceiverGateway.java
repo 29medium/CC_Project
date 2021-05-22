@@ -16,8 +16,8 @@ public class ReceiverGateway implements Runnable {
             byte[] buf = new byte[1000];
             DatagramPacket packet = new DatagramPacket(buf, buf.length);
             ds.receive(packet);
-            String received = new String(packet.getData(), 0, packet.getLength());
-            System.out.println(received);
+            Packet p = new Packet(buf);
+            System.out.println(p.toString());
         } catch (Exception ignored) {}
     }
 }

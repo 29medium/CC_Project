@@ -1,6 +1,7 @@
 import java.io.IOException;
 import java.net.DatagramPacket;
 import java.net.DatagramSocket;
+import java.net.InetAddress;
 
 class SenderFFS implements Runnable {
     private DatagramSocket ds;
@@ -14,8 +15,13 @@ class SenderFFS implements Runnable {
     public void run() {
         while(true) {
             try {
-                DatagramPacket dp = pq.remove();
-                ds.send(dp);
+                Packet p = pq.remove();
+                if(p!=null) {
+                    byte[] buf = p.packetToBytes();
+                    DatagramPacket dp = new DatagramPacket(buf, buf.length, InetAddress.getByName("localhost"), 88);
+
+                    ds.send(dp);
+                }
             } catch (IOException ignored) {}
         }
     }
