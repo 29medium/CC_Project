@@ -12,7 +12,8 @@ public class Gateway {
         UserList users = new UserList();
         int userCounter=0; // cada user vai ter um id para guardar na userlist
 
-        // Criar aqui uma thread para o keep alive
+        Thread keepAlive = new Thread(new KeepAlive(ds, servers));
+        keepAlive.start();
 
         // Thread para receber do FFS
         Thread receiver = new Thread(new ReceiverGateway(ds));

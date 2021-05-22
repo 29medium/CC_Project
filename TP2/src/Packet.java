@@ -5,10 +5,11 @@ import java.nio.ByteBuffer;
 import java.util.Arrays;
 
 public class Packet implements Serializable {
-    private int tipo; // 1-pedir ficheiro | 2-enviar ficherio | 3-ficheiro nao existe | 4-FFS ligou | 5-Keep Alive
+    private int tipo; // 1-pedir ficheiro | 2-enviar ficherio | 3-ficheiro nao existe | 4-FFS ligou | 5-Gateway informa que ligou | 6-Keep Alive | 7 - Resposta ao keep alive
     private String ipDestino;
     private int porta;
     private int idTransferencia;
+    // idUser
     private int chucnkTransferencia;
     private byte[] data;
 

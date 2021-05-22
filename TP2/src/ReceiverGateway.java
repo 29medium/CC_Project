@@ -20,6 +20,9 @@ public class ReceiverGateway implements Runnable {
 
             // Verificar o tipo de pacote de regresso e o utilizador a quem este se refere
             // Dar output ao utilizador através do map guardado no userset
+
         } catch (Exception ignored) {}
     }
+
+    // Tipo 2 3 4 7
 }
