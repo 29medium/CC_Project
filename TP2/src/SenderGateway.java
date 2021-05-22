@@ -21,8 +21,9 @@ class SenderGateway implements Runnable {
 
     public void run() {
         try {
+	
             String userPacket = in.readLine();
-
+	    System.out.println(userPacket);
             String[] tokens = userPacket.split(" ");
 
             //Escolha do servidor e ir buscar o ip e a porta ao array de servers

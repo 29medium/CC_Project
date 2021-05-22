@@ -16,7 +16,7 @@ public class ReceiverGateway implements Runnable {
             ds.receive(packet);
             Packet p = new Packet(buf);
 
-            // System.out.println(p.toString());
+            System.out.println(p.toString());
 
             // Verificar o tipo de pacote de regresso e o utilizador a quem este se refere
             // Dar output ao utilizador através do map guardado no userset

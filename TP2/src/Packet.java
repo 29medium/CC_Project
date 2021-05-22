@@ -3,6 +3,7 @@ import java.net.InetAddress;
 import java.net.UnknownHostException;
 import java.nio.ByteBuffer;
 import java.util.Arrays;
+import java.nio.charset.StandardCharsets;
 
 public class Packet implements Serializable {
     private int tipo; // 1-pedir ficheiro | 2-enviar ficherio | 3-ficheiro nao existe | 4-FFS ligou | 5-Gateway informa que ligou | 6-Keep Alive | 7 - Resposta ao keep alive
@@ -74,7 +75,7 @@ public class Packet implements Serializable {
                 ", porta=" + porta +
                 ", idTransferencia=" + idTransferencia +
                 ", chucnkTransferencia=" + chucnkTransferencia +
-                ", data=" + Arrays.toString(data) +
+                ", data=" + new String(data, StandardCharsets.UTF_8) + 
                 '}';
     }
 
