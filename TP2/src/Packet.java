@@ -99,7 +99,11 @@ public class Packet implements Serializable {
         return chucnkTransferencia;
     }
 
-    public String getData() {
-        return data.toString();
+    public byte[] getData() {
+        return data;
+    }
+
+    public String getDataString() {
+        return new String(data, StandardCharsets.UTF_8);
     }
 }
