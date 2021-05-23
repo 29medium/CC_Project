@@ -20,7 +20,7 @@ class SenderFFS implements Runnable {
                     Packet p = pq.remove();
 
                     byte[] buf = p.packetToBytes();
-                    DatagramPacket dp = new DatagramPacket(buf, buf.length, InetAddress.getByName("10.1.1.1"), 88);
+                    DatagramPacket dp = new DatagramPacket(buf, buf.length, InetAddress.getByName("10.1.1.1"), 8888);
 
                     ds.send(dp);
                 }

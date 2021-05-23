@@ -5,8 +5,8 @@ import java.net.Socket;
 
 public class Gateway {
     public static void main(String[] args) throws IOException {
-        ServerSocket ss = new ServerSocket(80);
-        DatagramSocket ds = new DatagramSocket(88);
+        ServerSocket ss = new ServerSocket(8080);
+        DatagramSocket ds = new DatagramSocket(8888);
 
         ServerList servers = new ServerList();
         UserList users = new UserList();

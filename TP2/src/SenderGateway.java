@@ -27,10 +27,10 @@ class SenderGateway implements Runnable {
 	        System.out.println(userPacket);
             String[] tokens = userPacket.split(" ");
 		
-            Packet p = new Packet(1, "10.1.1.2", 88, 1, 1, tokens[1].getBytes());
+            Packet p = new Packet(1, "10.1.1.2", 8888, 1, 1, tokens[1].getBytes());
             System.out.println(p.toString());
 	    byte[] buf = p.packetToBytes();
-            DatagramPacket packet = new DatagramPacket(buf, buf.length, InetAddress.getByName(p.getIpDestino()),88);
+            DatagramPacket packet = new DatagramPacket(buf, buf.length, InetAddress.getByName(p.getIpDestino()),8888);
 	        System.out.println(p.toString());
 
             ds.send(packet);

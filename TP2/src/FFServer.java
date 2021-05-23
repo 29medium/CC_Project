@@ -3,7 +3,7 @@ import java.net.DatagramSocket;
 
 public class FFServer {
     public static void main(String[] args) throws IOException {
-        DatagramSocket ds = new DatagramSocket(88);
+        DatagramSocket ds = new DatagramSocket(8888);
         PacketQueue pq = new PacketQueue();
 
         // Criar pacote a dizer que se ligou (4)

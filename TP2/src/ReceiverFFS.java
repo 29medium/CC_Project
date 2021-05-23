@@ -33,7 +33,7 @@ class ReceiverFFS implements Runnable {
                         newp = packetType1(p);
                         break;
                     default:
-		        newp = new Packet(8,"10.1.1.1",80,1,1,"Erro em alguma coisa".getBytes(StandardCharsets.UTF_8));
+		        newp = new Packet(8,"10.1.1.1",8080,1,1,"Erro em alguma coisa".getBytes(StandardCharsets.UTF_8));
                         break;
                 }
 
@@ -50,10 +50,10 @@ class ReceiverFFS implements Runnable {
 	// Pegar na data, tentar ir buscar o ficheiro
         if (file.exists() && file.isFile()) {
             byte[] bytes = Files.readAllBytes(file.toPath());
-            return new Packet(2,"10.1.1.1",80,1,1, bytes); // Se encontrar o ficheiro devolver tipo 2 e na data vai o ficheiro
+            return new Packet(2,"10.1.1.1",8080,1,1, bytes); // Se encontrar o ficheiro devolver tipo 2 e na data vai o ficheiro
         }
         else {
-            return new Packet(3,"10.1.1.1",80,1,1,"Ficheiro Nao Encontrado".getBytes(StandardCharsets.UTF_8));// Se não encontrar o ficheiro devolver tipo 3 e na data vai uma mensagem de erro
+            return new Packet(3,"10.1.1.1",8080,1,1,"Ficheiro Nao Encontrado".getBytes(StandardCharsets.UTF_8));// Se não encontrar o ficheiro devolver tipo 3 e na data vai uma mensagem de erro
         }
     }
 

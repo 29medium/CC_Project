@@ -6,7 +6,11 @@ import java.util.Arrays;
 import java.nio.charset.StandardCharsets;
 
 public class Packet implements Serializable {
-    private int tipo; // 1-pedir ficheiro | 2-enviar ficherio | 3-ficheiro nao existe | 4-FFS ligou | 5-Gateway informa que ligou | 6-Keep Alive | 7 - Resposta ao keep alive
+    // 1 - Pergunta aos FFs se ficheiro existe | 2 - Responde que possui o ficheiro       | 3 - Responde que ficheiro nao existe
+    // 4 - Pede ao FFs um ficheiro que possui  | 5 - Envia o ficheiro requisitado
+    // 6 - FFs informa que se pretende ligar   | 7 - FFs informa que se pretende desligar | 8 - Gateway informa que FSs se ligou corretamente
+    // 9 - Gateway envia um Keep Alive         | 10- FFs responde que ainda está ligado
+    private int tipo;
     private String ipDestino;
     private int porta;
     private int idTransferencia;
