@@ -3,7 +3,8 @@ import java.io.IOException;
 import java.net.DatagramPacket;
 import java.net.DatagramSocket;
 import java.nio.charset.StandardCharsets;
-import java.nio.file.Files;
+import java.nio.file.*;
+import java.util.Arrays;
 
 class ReceiverFFS implements Runnable {
     private DatagramSocket ds;
@@ -20,7 +21,10 @@ class ReceiverFFS implements Runnable {
                 byte[] arr = new byte[1000];
                 DatagramPacket dp = new DatagramPacket(arr, arr.length);
                 ds.receive(dp);
-                Packet p = new Packet(arr); // Cria um pacote com as merdas recebidas do gateway
+		
+		byte[] conteudoPacote = new byte[dp.getLength()];
+		System.arraycopy(dp.getData(), 0, conteudoPacote, 0, dp.getLength());
+                Packet p = new Packet(conteudoPacote); // Cria um pacote com as merdas recebidas do gateway
 
                 // Intrepreta e cria novo pacote após interpretação
                 Packet newp;
@@ -29,7 +33,7 @@ class ReceiverFFS implements Runnable {
                         newp = packetType1(p);
                         break;
                     default:
-			            newp = new Packet(8,"10.1.1.1",80,1,1,"Erro em alguma coisa".getBytes(StandardCharsets.UTF_8));
+		        newp = new Packet(8,"10.1.1.1",80,1,1,"Erro em alguma coisa".getBytes(StandardCharsets.UTF_8));
                         break;
                 }
 
@@ -41,16 +45,16 @@ class ReceiverFFS implements Runnable {
 
     public Packet packetType1(Packet p) throws IOException {
 
-        File file = new File(p.getDataString());
-        // Pegar na data, tentar ir buscar o ficheiro
-        if (file.exists()) {
+	File file = new File("/home/core" + p.getDataString());
+
+	// Pegar na data, tentar ir buscar o ficheiro
+        if (file.exists() && file.isFile()) {
             byte[] bytes = Files.readAllBytes(file.toPath());
             return new Packet(2,"10.1.1.1",80,1,1, bytes); // Se encontrar o ficheiro devolver tipo 2 e na data vai o ficheiro
         }
         else {
             return new Packet(3,"10.1.1.1",80,1,1,"Ficheiro Nao Encontrado".getBytes(StandardCharsets.UTF_8));// Se não encontrar o ficheiro devolver tipo 3 e na data vai uma mensagem de erro
         }
-
     }
 
 }

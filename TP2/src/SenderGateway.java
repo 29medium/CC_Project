@@ -5,6 +5,7 @@ import java.net.DatagramPacket;
 import java.net.DatagramSocket;
 import java.net.InetAddress;
 import java.net.Socket;
+import java.nio.charset.StandardCharsets;
 
 class SenderGateway implements Runnable {
     private DatagramSocket ds;
@@ -25,10 +26,10 @@ class SenderGateway implements Runnable {
             String userPacket = in.readLine();
 	        System.out.println(userPacket);
             String[] tokens = userPacket.split(" ");
-
-            //Escolha do servidor e ir buscar o ip e a porta ao array de servers
+		
             Packet p = new Packet(1, "10.1.1.2", 88, 1, 1, tokens[1].getBytes());
-            byte[] buf = p.packetToBytes();
+            System.out.println(p.toString());
+	    byte[] buf = p.packetToBytes();
             DatagramPacket packet = new DatagramPacket(buf, buf.length, InetAddress.getByName(p.getIpDestino()),88);
 	        System.out.println(p.toString());
 
