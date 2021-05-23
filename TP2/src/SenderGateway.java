@@ -1,39 +1,32 @@
-import java.io.BufferedReader;
 import java.io.IOException;
-import java.io.InputStreamReader;
 import java.net.DatagramPacket;
 import java.net.DatagramSocket;
 import java.net.InetAddress;
-import java.net.Socket;
-import java.nio.charset.StandardCharsets;
 
 class SenderGateway implements Runnable {
     private DatagramSocket ds;
-    private BufferedReader in;
-    private final Socket s;
     private final ServerList servers;
+    private PacketQueue queue;
 
-    public SenderGateway(DatagramSocket ds, Socket s, ServerList servers) throws IOException {
+    public SenderGateway(DatagramSocket ds, ServerList servers , PacketQueue queue) throws IOException {
         this.ds = ds;
-        this.in = new BufferedReader(new InputStreamReader(s.getInputStream()));
-        this.s = s;
         this.servers = servers;
+        this.queue = queue;
     }
 
     public void run() {
-        try {
-	
-            String userPacket = in.readLine();
-	        System.out.println(userPacket);
-            String[] tokens = userPacket.split(" ");
-		
-            Packet p = new Packet(1, "10.1.1.2", 8888, 1, 1, tokens[1].getBytes());
-            System.out.println(p.toString());
-	        byte[] buf = p.packetToBytes();
-            DatagramPacket packet = new DatagramPacket(buf, buf.length, InetAddress.getByName(p.getIpDestino()),8888);
-	        System.out.println(p.toString());
+        while(true) {
+            try {
+                // Deviamos trocar o facto de estar vazio para uma condition para nao termos uma espera ativa
+                if(!queue.isEmpty()) {
+                    Packet p = queue.remove();
 
-            ds.send(packet);
-        } catch (IOException ignored) {}
+                    byte[] buf = p.packetToBytes();
+                    DatagramPacket dp = new DatagramPacket(buf, buf.length, InetAddress.getByName(p.getIpDestino()), p.getPortaDestino());
+
+                    ds.send(dp);
+                }
+            } catch (IOException ignored) {}
+        }
     }
 }

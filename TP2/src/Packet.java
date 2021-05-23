@@ -4,27 +4,36 @@ import java.net.UnknownHostException;
 import java.nio.ByteBuffer;
 import java.util.Arrays;
 import java.nio.charset.StandardCharsets;
+import java.util.concurrent.locks.Lock;
+import java.util.concurrent.locks.ReentrantLock;
 
 public class Packet implements Serializable {
     public static final int MAX_SIZE_DATA = 1024;
-    public static final int MAX_SIZE_PACKET = MAX_SIZE_DATA + 20;
+    public static final int MAX_SIZE_PACKET = MAX_SIZE_DATA + 32;
+    public static int id_counter=0;
+    private static ReentrantLock lock = new ReentrantLock();
     // 1 - Pergunta aos FFs se ficheiro existe | 2 - Responde que possui o ficheiro       | 3 - Responde que ficheiro nao existe
     // 4 - Pede ao FFs um ficheiro que possui  | 5 - Envia o ficheiro requisitado
     // 6 - FFs informa que se pretende ligar   | 7 - FFs informa que se pretende desligar | 8 - Gateway informa que FSs se ligou corretamente
     // 9 - Gateway envia um Keep Alive         | 10- FFs responde que ainda está ligado
     private int tipo;
+    private String ipOrigem;
     private String ipDestino;
-    private int porta;
+    private int portaOrigem;
+    private int portaDestino;
     private int idTransferencia;
-    // idUser
+    private int idUser;
     private int chucnkTransferencia;
     private byte[] data;
 
-    public Packet (int tipo, String ipDestino, int porta, int idTransferencia, int chucnkTransferencia, byte[] data) {
+    public Packet (int tipo, String ipOrigem, String ipDestino, int portaOrigem, int portaDestino, int idTransferencia, int idUser, int chucnkTransferencia, byte[] data) {
         this.tipo = tipo;
+        this.ipOrigem = ipOrigem;
         this.ipDestino = ipDestino;
-        this.porta = porta;
+        this.portaOrigem = portaOrigem;
+        this.portaDestino = portaDestino;
         this.idTransferencia = idTransferencia;
+        this.idUser = idUser;
         this.chucnkTransferencia = chucnkTransferencia;
         this.data = data;
     }
@@ -35,32 +44,43 @@ public class Packet implements Serializable {
         this.tipo = ByteBuffer.wrap(arrayBytes,0,4).getInt();
 
         System.arraycopy(arrayBytes, 4, auxiliar, 0, 4);
+        this.ipOrigem = InetAddress.getByAddress(auxiliar).getHostAddress();
+
+        System.arraycopy(arrayBytes, 8, auxiliar, 0, 4);
         this.ipDestino = InetAddress.getByAddress(auxiliar).getHostAddress();
 
-        this.porta = ByteBuffer.wrap(arrayBytes,8,4).getInt();
-        this.idTransferencia = ByteBuffer.wrap(arrayBytes,12,4).getInt();
-        this.chucnkTransferencia = ByteBuffer.wrap(arrayBytes,16,4).getInt();
+        this.portaOrigem = ByteBuffer.wrap(arrayBytes,12,4).getInt();
+        this.portaDestino = ByteBuffer.wrap(arrayBytes,16,4).getInt();
+        this.idTransferencia = ByteBuffer.wrap(arrayBytes,20,4).getInt();
+        this.idUser = ByteBuffer.wrap(arrayBytes,24,4).getInt();
+        this.chucnkTransferencia = ByteBuffer.wrap(arrayBytes,28,4).getInt();
 
-        byte[] newData = new byte[arrayBytes.length - 20];
-        System.arraycopy(arrayBytes, 20, newData, 0, arrayBytes.length-20);
+        byte[] newData = new byte[arrayBytes.length - 32];
+        System.arraycopy(arrayBytes, 32, newData, 0, arrayBytes.length-20);
         this.data = newData;
     }
 
 
     byte[] packetToBytes () throws UnknownHostException {
-        byte[] pacoteEmBytes = new byte[20 + this.data.length];
+        byte[] pacoteEmBytes = new byte[32 + this.data.length];
 
         byte[] tipo = convertIntToByteArray(this.tipo);
         System.arraycopy(tipo,0,pacoteEmBytes,0,4);
+        byte[] ipOrigem = InetAddress.getByName(this.ipOrigem).getAddress();
+        System.arraycopy(ipOrigem,0,pacoteEmBytes,4,4);
         byte[] ipDestino = InetAddress.getByName(this.ipDestino).getAddress();
-        System.arraycopy(ipDestino,0,pacoteEmBytes,4,4);
-        byte[] porta = convertIntToByteArray(this.porta);
-        System.arraycopy(porta,0,pacoteEmBytes,8,4);
+        System.arraycopy(ipDestino,0,pacoteEmBytes,8,4);
+        byte[] portaOrigem = convertIntToByteArray(this.portaOrigem);
+        System.arraycopy(portaOrigem,0,pacoteEmBytes,12,4);
+        byte[] portaDestino = convertIntToByteArray(this.portaDestino);
+        System.arraycopy(portaDestino,0,pacoteEmBytes,16,4);
         byte[] idTransferencia = convertIntToByteArray(this.idTransferencia);
-        System.arraycopy(idTransferencia,0,pacoteEmBytes,12,4);
+        System.arraycopy(idTransferencia,0,pacoteEmBytes,20,4);
+        byte[] idUser = convertIntToByteArray(this.idUser);
+        System.arraycopy(idUser,0,pacoteEmBytes,24,4);
         byte[] chucnkTransferencia = convertIntToByteArray(this.chucnkTransferencia);
-        System.arraycopy(chucnkTransferencia,0,pacoteEmBytes,16,4);
-        System.arraycopy(this.data,0,pacoteEmBytes,20,this.data.length);
+        System.arraycopy(chucnkTransferencia,0,pacoteEmBytes,28,4);
+        System.arraycopy(this.data,0,pacoteEmBytes,32,this.data.length);
 
         return pacoteEmBytes;
     }
@@ -77,9 +97,12 @@ public class Packet implements Serializable {
     public String toString() {
         return "Packet{" +
                 "tipo=" + tipo +
+                ", ipOrigem='" + ipOrigem + '\'' +
                 ", ipDestino='" + ipDestino + '\'' +
-                ", porta=" + porta +
+                ", portaOrigem=" + portaOrigem +
+                ", portaDestino=" + portaDestino +
                 ", idTransferencia=" + idTransferencia +
+                ", idUser=" + idUser +
                 ", chucnkTransferencia=" + chucnkTransferencia +
                 ", data=" + new String(data, StandardCharsets.UTF_8) + 
                 '}';
@@ -89,12 +112,24 @@ public class Packet implements Serializable {
         return tipo;
     }
 
+    public String getIpOrigem() {
+        return ipOrigem;
+    }
+
     public String getIpDestino() {
         return ipDestino;
     }
 
-    public int getPorta() {
-        return porta;
+    public int getPortaOrigem() {
+        return portaOrigem;
+    }
+
+    public int getPortaDestino() {
+        return portaDestino;
+    }
+
+    public int getIdUser() {
+        return idUser;
     }
 
     public int getIdTransferencia() {
@@ -111,5 +146,14 @@ public class Packet implements Serializable {
 
     public String getDataString() {
         return new String(data, StandardCharsets.UTF_8);
+    }
+
+    public static int getIdTransferenciaCounter() {
+        lock.lock();
+        try {
+            return id_counter++;
+        }finally {
+            lock.unlock();
+        }
     }
 }
