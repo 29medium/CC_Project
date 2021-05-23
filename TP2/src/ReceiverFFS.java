@@ -18,12 +18,12 @@ class ReceiverFFS implements Runnable {
     public void run() {
         while (true) {
             try {
-                byte[] arr = new byte[1000];
+                byte[] arr = new byte[Packet.MAX_SIZE_PACKET + 10]; //Acrescentamos 10 bytes apenas para proteção neste momento
                 DatagramPacket dp = new DatagramPacket(arr, arr.length);
                 ds.receive(dp);
 		
-		byte[] conteudoPacote = new byte[dp.getLength()];
-		System.arraycopy(dp.getData(), 0, conteudoPacote, 0, dp.getLength());
+		        byte[] conteudoPacote = new byte[dp.getLength()];
+		        System.arraycopy(dp.getData(), 0, conteudoPacote, 0, dp.getLength());
                 Packet p = new Packet(conteudoPacote); // Cria um pacote com as merdas recebidas do gateway
 
                 // Intrepreta e cria novo pacote após interpretação
@@ -33,7 +33,7 @@ class ReceiverFFS implements Runnable {
                         newp = packetType1(p);
                         break;
                     default:
-		        newp = new Packet(8,"10.1.1.1",8080,1,1,"Erro em alguma coisa".getBytes(StandardCharsets.UTF_8));
+		                newp = new Packet(8,"10.1.1.1",8080,1,1,"Erro em alguma coisa".getBytes(StandardCharsets.UTF_8));
                         break;
                 }
 
