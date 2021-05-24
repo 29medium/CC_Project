@@ -33,8 +33,6 @@ public class Gateway {
 
             ServerData sd = servers.getServer();
             queue.add(new Packet(1, InetAddress.getLocalHost().getHostAddress(), sd.getIp(), 8888, sd.getPort(), userCounter-1, 0, tokens[1].getBytes()));
-
-            in.close();
         }
     }
 }
