@@ -19,15 +19,21 @@ class ServerData {
     public int getPort() {
         return this.port;
     }
+
+    public String toString() {
+        return "port=" + port + ", ip='" + ip + '\'';
+    }
 }
 
 public class ServerList {
     private List<ServerData> servers;
     private ReentrantLock lock;
+    private int nextServer;
 
     public ServerList() {
         servers = new ArrayList<>();
         lock = new ReentrantLock();
+        nextServer = 0;
     }
 
     public boolean isServer(String ip) {
@@ -56,8 +62,29 @@ public class ServerList {
         lock.lock();
         try {
             servers.removeIf(sd -> sd.getIp().equals(ip));
+            if(nextServer==servers.size())
+                nextServer = 0;
         } finally {
             lock.unlock();
         }
+    }
+
+    public ServerData getServer() {
+        lock.lock();
+        try {
+            ServerData res = servers.get(this.nextServer);
+            nextServer = (nextServer + 1) % servers.size();
+            return res;
+        } finally {
+            lock.unlock();
+        }
+    }
+
+    public ReentrantLock getLock() {
+        return lock;
+    }
+
+    public String toString() {
+        return "ServerList{" + "servers=" + servers.toString() + '}';
     }
 }

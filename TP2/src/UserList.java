@@ -29,4 +29,13 @@ public class UserList {
             lock.unlock();
         }
     }
+
+    public void remove(int i) {
+        lock.lock();
+        try {
+            users.remove(i);
+        } finally {
+            lock.unlock();
+        }
+    }
 }

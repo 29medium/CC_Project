@@ -15,7 +15,7 @@ public class Gateway {
         keepAlive.start();
 
         // Thread para receber do FFS
-        Thread receiver = new Thread(new ReceiverGateway(ds, servers, queue));
+        Thread receiver = new Thread(new ReceiverGateway(ds, servers, queue, users));
         Thread sender = new Thread(new SenderGateway(ds, servers, queue));
 
         receiver.start();
@@ -32,9 +32,8 @@ public class Gateway {
             System.out.println(userPacket);
             String[] tokens = userPacket.split(" ");
 
-            //Packet p = new Packet(1, InetAddress.getLocalHost().getHostAddress(), "10.1.1.2", 8888, 1, userCounter-1, 0, tokens[1].getBytes());
-
-            //queue.add(p);
+            ServerData sd = servers.getServer();
+            queue.add(new Packet(1, InetAddress.getLocalHost().getHostAddress(), sd.getIp(), 8888, sd.getPort(), Packet.getIdTransferenciaCounter(), userCounter-1, 0, tokens[1].getBytes()));
         }
     }
 }

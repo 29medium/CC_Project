@@ -56,7 +56,7 @@ public class Packet implements Serializable {
         this.chucnkTransferencia = ByteBuffer.wrap(arrayBytes,28,4).getInt();
 
         byte[] newData = new byte[arrayBytes.length - 32];
-        System.arraycopy(arrayBytes, 32, newData, 0, arrayBytes.length-20);
+        System.arraycopy(arrayBytes, 32, newData, 0, arrayBytes.length-32);
         this.data = newData;
     }
 
