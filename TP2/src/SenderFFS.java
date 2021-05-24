@@ -14,8 +14,13 @@ class SenderFFS implements Runnable {
         this.exit = false;
     }
 
+    @Deprecated
+    public void stop() {
+        exit = true;
+    }
+
     public void run() {
-        while(!exit) {
+        while(!exit || !pq.isEmpty()) {
             try {
                 Packet p = pq.remove();
 
@@ -25,10 +30,5 @@ class SenderFFS implements Runnable {
                 ds.send(dp);
             } catch (IOException | InterruptedException ignored) {}
         }
-    }
-
-    @Deprecated
-    public void stop() {
-        exit = true;
     }
 }

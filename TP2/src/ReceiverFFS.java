@@ -53,6 +53,10 @@ class ReceiverFFS implements Runnable {
                     case 8:
                         System.out.println("Conectado com sucesso");
                         break;
+                    case 10:
+                        System.out.println("Conecção encerrada");
+                        exit = true;
+                        break;
                     default:
 		                newp = new Packet(11,InetAddress.getLocalHost().getHostAddress(), ipGateway, 8888,portaGateway,-1,0,"Erro em alguma coisa".getBytes(StandardCharsets.UTF_8));
                         pq.add(newp);
@@ -60,11 +64,6 @@ class ReceiverFFS implements Runnable {
                 }
             } catch (IOException ignored) {}
         }
-    }
-
-    @Deprecated
-    public void stop() {
-        exit = true;
     }
 
     public Packet packetType1(Packet p) throws IOException {

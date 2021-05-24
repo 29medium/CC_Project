@@ -30,9 +30,6 @@ public class FFServer {
         Packet pacoteEncerrarLigacao = new Packet(7, InetAddress.getLocalHost().getHostAddress(), ipGateway, 8888, portaGateway, -1, 1, "FFs ira encerrar ligacao estabelecida".getBytes(StandardCharsets.UTF_8));
         pq.addFirst(pacoteEncerrarLigacao);
 
-        Thread.sleep(1000); // Para nao intorromper envios de ficheiros grandes
-
-        receiver.stop();
         sender.stop();
         beacon.stop();
     }

@@ -9,7 +9,6 @@ class PacketQueue {
     private ReentrantLock lock;
     private Condition con;
 
-
     public PacketQueue() {
         packets = new LinkedList<>();
         lock = new ReentrantLock();
@@ -43,6 +42,15 @@ class PacketQueue {
                 con.await();
 
             return packets.remove();
+        } finally {
+            lock.unlock();
+        }
+    }
+
+    public boolean isEmpty() {
+        lock.lock();
+        try {
+            return packets.isEmpty();
         } finally {
             lock.unlock();
         }

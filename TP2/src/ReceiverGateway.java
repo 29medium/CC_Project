@@ -104,8 +104,11 @@ public class ReceiverGateway implements Runnable {
         queue.add(pnew);
     }
 
-    public void packetType7(Packet p) {
+    public void packetType7(Packet p) throws UnknownHostException {
         servers.removeServer(p.getIpOrigem());
+
+        Packet pnew = new Packet(10, InetAddress.getLocalHost().getHostAddress(), p.getIpOrigem(), 8888, p.getPortaOrigem(), -1, 0, "Coneccao encerrada".getBytes(StandardCharsets.UTF_8));
+        queue.add(pnew);
     }
 
     public void packetType9(Packet p) {
