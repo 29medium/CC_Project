@@ -33,7 +33,6 @@ public class FFServer {
         Thread.sleep(1000); // Para nao intorromper envios de ficheiros grandes
 
         receiver.stop();
-        pq.notEmpty();
         sender.stop();
         beacon.stop();
     }
