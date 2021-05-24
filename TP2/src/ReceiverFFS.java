@@ -62,6 +62,7 @@ class ReceiverFFS implements Runnable {
         }
     }
 
+    @Deprecated
     public void stop() {
         exit = true;
     }

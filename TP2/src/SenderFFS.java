@@ -27,6 +27,7 @@ class SenderFFS implements Runnable {
         }
     }
 
+    @Deprecated
     public void stop() {
         exit = true;
     }

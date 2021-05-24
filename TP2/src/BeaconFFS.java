@@ -26,6 +26,7 @@ public class BeaconFFS implements Runnable{
         }
     }
 
+    @Deprecated
     public void stop() {
         exit = true;
     }
