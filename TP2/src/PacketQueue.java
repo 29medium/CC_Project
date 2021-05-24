@@ -12,6 +12,7 @@ class PacketQueue {
     public PacketQueue() {
         packets = new LinkedList<>();
         lock = new ReentrantLock();
+        con = lock.newCondition();
     }
 
     public void add(Packet packet) {
