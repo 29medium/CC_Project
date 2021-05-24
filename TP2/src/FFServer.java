@@ -18,9 +18,11 @@ public class FFServer {
 
         Thread receiver = new Thread(new ReceiverFFS(ds, pq, ipGateway, portaGateway));
         Thread sender = new Thread(new SenderFFS(ds, pq));
+        Thread beacon = new Thread(new BeaconFFS(pq, ipGateway, portaGateway));
 
         receiver.start();
         sender.start();
+        beacon.start();
 
         BufferedReader reader = new BufferedReader(new InputStreamReader(System.in));
         String pedido = reader.readLine();

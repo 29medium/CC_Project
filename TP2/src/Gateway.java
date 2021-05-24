@@ -11,15 +11,14 @@ public class Gateway {
         UserList users = new UserList();
         int userCounter=0; // cada user vai ter um id para guardar na userlist
 
-        Thread keepAlive = new Thread(new KeepAlive(ds, servers));
-        keepAlive.start();
-
         // Thread para receber do FFS
         Thread receiver = new Thread(new ReceiverGateway(ds, servers, queue, users));
         Thread sender = new Thread(new SenderGateway(ds, servers, queue));
+        Thread beacon = new Thread(new BeaconGateway(ds, servers));
 
         receiver.start();
         sender.start();
+        beacon.start();
 
         while(true) {
             Socket s = ss.accept();
@@ -34,6 +33,7 @@ public class Gateway {
 
             ServerData sd = servers.getServer();
             queue.add(new Packet(1, InetAddress.getLocalHost().getHostAddress(), sd.getIp(), 8888, sd.getPort(), Packet.getIdTransferenciaCounter(), userCounter-1, 0, tokens[1].getBytes()));
+            queue.getCon().signalAll();
         }
     }
 }

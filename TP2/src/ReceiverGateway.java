@@ -47,6 +47,9 @@ public class ReceiverGateway implements Runnable {
                     case 7:
                         packetType7(p);
                         break;
+                    case 9:
+                        packetType9(p);
+                        break;
                     default:
                         break;
                 }
@@ -71,7 +74,7 @@ public class ReceiverGateway implements Runnable {
         Socket s = users.getSocket(p.getIdUser());
         DataOutputStream out = new DataOutputStream(s.getOutputStream());
 
-        out.writeUTF("Tenho o ficheiro");
+        out.write(p.getData());
         out.flush();
 
         out.close();
@@ -89,5 +92,9 @@ public class ReceiverGateway implements Runnable {
 
     public void packetType7(Packet p) {
         servers.removeServer(p.getIpOrigem());
+    }
+
+    public void packetType9(Packet p) {
+        servers.updateTime(p.getIpOrigem());
     }
 }

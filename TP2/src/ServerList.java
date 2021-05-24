@@ -1,15 +1,25 @@
 import java.net.Socket;
+import java.time.LocalTime;
+import java.time.ZoneId;
+import java.time.temporal.ChronoUnit;
+import java.time.temporal.TemporalUnit;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.concurrent.locks.ReentrantLock;
+
+import static java.util.concurrent.TimeUnit.SECONDS;
 
 class ServerData {
     private int port;
     private String ip;
+    private LocalTime lastUpdate;
 
     public ServerData(int port, String ip) {
         this.port = port;
         this.ip = ip;
+        this.lastUpdate = LocalTime.now(ZoneId.of("UTC"));
     }
 
     public String getIp() {
@@ -23,15 +33,23 @@ class ServerData {
     public String toString() {
         return "port=" + port + ", ip='" + ip + '\'';
     }
+
+    public LocalTime getLastUpdate() {
+        return this.lastUpdate;
+    }
+
+    public void updateTime() {
+        this.lastUpdate = LocalTime.now(ZoneId.of("UTC"));
+    }
 }
 
 public class ServerList {
-    private List<ServerData> servers;
+    private Map<String, ServerData> servers;
     private ReentrantLock lock;
     private int nextServer;
 
     public ServerList() {
-        servers = new ArrayList<>();
+        servers = new HashMap<>();
         lock = new ReentrantLock();
         nextServer = 0;
     }
@@ -39,11 +57,7 @@ public class ServerList {
     public boolean isServer(String ip) {
         lock.lock();
         try {
-            for(ServerData sd : servers)
-                if(sd.getIp().equals(ip))
-                    return true;
-
-            return false;
+            return servers.containsKey(ip);
         } finally {
             lock.unlock();
         }
@@ -52,7 +66,7 @@ public class ServerList {
     public void addServer(int port, String ip) {
         lock.lock();
         try {
-            servers.add(new ServerData(port,ip));
+            servers.put(ip, new ServerData(port,ip));
         } finally {
             lock.unlock();
         }
@@ -61,7 +75,7 @@ public class ServerList {
     public void removeServer(String ip) {
         lock.lock();
         try {
-            servers.removeIf(sd -> sd.getIp().equals(ip));
+            servers.remove(ip);
             if(nextServer==servers.size())
                 nextServer = 0;
         } finally {
@@ -72,7 +86,7 @@ public class ServerList {
     public ServerData getServer() {
         lock.lock();
         try {
-            ServerData res = servers.get(this.nextServer);
+            ServerData res = (ServerData) servers.values().toArray()[nextServer];
             nextServer = (nextServer + 1) % servers.size();
             return res;
         } finally {
@@ -80,8 +94,30 @@ public class ServerList {
         }
     }
 
-    public ReentrantLock getLock() {
-        return lock;
+    public void updateTime(String ip) {
+        lock.lock();
+        try {
+            servers.get(ip).updateTime();
+        } finally {
+            lock.unlock();
+        }
+    }
+
+    public void removeIdle() {
+        lock.lock();
+        try {
+            List <String> forRemove = new ArrayList<>();
+            for(ServerData sa : servers.values())
+                if(sa.getLastUpdate().until(LocalTime.now(ZoneId.of("UTC")), ChronoUnit.SECONDS)>15)
+                    forRemove.add(sa.getIp());
+
+            for(String ip : forRemove) {
+                removeServer(ip);
+                System.out.println("Servidor removido por idle: " + ip);
+            }
+        } finally {
+            lock.unlock();
+        }
     }
 
     public String toString() {

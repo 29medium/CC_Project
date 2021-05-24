@@ -2,8 +2,6 @@ import java.io.IOException;
 import java.net.DatagramPacket;
 import java.net.DatagramSocket;
 import java.net.InetAddress;
-import java.net.UnknownHostException;
-import java.nio.charset.StandardCharsets;
 
 class SenderFFS implements Runnable {
     private DatagramSocket ds;
@@ -17,15 +15,12 @@ class SenderFFS implements Runnable {
     public void run() {
         while(true) {
             try {
-                // Deviamos trocar o facto de estar vazio para uma condition para nao termos uma espera ativa
-                if(!pq.isEmpty()) {
-                    Packet p = pq.remove();
+                Packet p = pq.remove();
 
-                    byte[] buf = p.packetToBytes();
-                    DatagramPacket dp = new DatagramPacket(buf, buf.length, InetAddress.getByName(p.getIpDestino()), p.getPortaDestino());
+                byte[] buf = p.packetToBytes();
+                DatagramPacket dp = new DatagramPacket(buf, buf.length, InetAddress.getByName(p.getIpDestino()), p.getPortaDestino());
 
-                    ds.send(dp);
-                }
+                ds.send(dp);
             } catch (IOException ignored) {}
         }
     }

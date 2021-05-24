@@ -1,11 +1,12 @@
 import java.net.DatagramPacket;
 import java.net.DatagramSocket;
 
-public class KeepAlive implements Runnable{
+public class BeaconGateway implements Runnable{
     private DatagramSocket ds;
     private ServerList servers;
+    private final int SLEEP_TIME = 15000;
 
-    public KeepAlive(DatagramSocket ds, ServerList servers) {
+    public BeaconGateway(DatagramSocket ds, ServerList servers) {
         this.ds = ds;
         this.servers = servers;
     }
@@ -13,9 +14,8 @@ public class KeepAlive implements Runnable{
     public void run() {
         while(true) {
             try {
-                // Percorrer a lista e enviar um keep alive a todos os servers
-
-                Thread.sleep(60000);
+                Thread.sleep(SLEEP_TIME);
+                servers.removeIdle();
             } catch (InterruptedException ignored) { }
         }
     }

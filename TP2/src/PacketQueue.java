@@ -1,11 +1,13 @@
 import java.net.DatagramPacket;
 import java.util.LinkedList;
 import java.util.Queue;
+import java.util.concurrent.locks.Condition;
 import java.util.concurrent.locks.ReentrantLock;
 
 class PacketQueue {
-    private Queue<Packet> packets;
+    private LinkedList<Packet> packets;
     private ReentrantLock lock;
+    private Condition con;
 
     public PacketQueue() {
         packets = new LinkedList<>();
@@ -16,6 +18,17 @@ class PacketQueue {
         lock.lock();
         try {
             packets.add(packet);
+            con.signalAll();
+        } finally {
+            lock.unlock();
+        }
+    }
+
+    public void addFirst(Packet packet) {
+        lock.lock();
+        try {
+            packets.addFirst(packet);
+            con.signalAll();
         } finally {
             lock.unlock();
         }
@@ -24,6 +37,11 @@ class PacketQueue {
     public Packet remove() {
         lock.lock();
         try {
+            try {
+                while (isEmpty())
+                    con.await();
+            } catch (InterruptedException ignored){}
+
             return packets.remove();
         } finally {
             lock.unlock();
@@ -37,5 +55,13 @@ class PacketQueue {
         } finally {
             lock.unlock();
         }
+    }
+
+    public ReentrantLock getLock() {
+        return lock;
+    }
+
+    public Condition getCon() {
+        return con;
     }
 }

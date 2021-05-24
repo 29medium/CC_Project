@@ -17,15 +17,12 @@ class SenderGateway implements Runnable {
     public void run() {
         while(true) {
             try {
-                // Deviamos trocar o facto de estar vazio para uma condition para nao termos uma espera ativa
-                if(!queue.isEmpty()) {
-                    Packet p = queue.remove();
+                Packet p = queue.remove();
 
-                    byte[] buf = p.packetToBytes();
-                    DatagramPacket dp = new DatagramPacket(buf, buf.length, InetAddress.getByName(p.getIpDestino()), p.getPortaDestino());
+                byte[] buf = p.packetToBytes();
+                DatagramPacket dp = new DatagramPacket(buf, buf.length, InetAddress.getByName(p.getIpDestino()), p.getPortaDestino());
 
-                    ds.send(dp);
-                }
+                ds.send(dp);
             } catch (IOException ignored) {}
         }
     }
