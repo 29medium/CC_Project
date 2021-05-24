@@ -1,4 +1,3 @@
-import java.io.BufferedOutputStream;
 import java.io.DataOutputStream;
 import java.io.IOException;
 import java.net.*;
@@ -28,20 +27,20 @@ public class ReceiverGateway implements Runnable {
                 System.arraycopy(dp.getData(), 0, conteudoPacote, 0, dp.getLength());
                 Packet p = new Packet(conteudoPacote); // Cria um pacote com as merdas recebidas do gateway
 
-                Packet newp;
-
                 System.out.println(p.toString());
 
                 switch (p.getTipo()) {
                     case 2:
                         packetType2(p);
                         break;
+                    case 3:
+                        packetType3(p);
+                        break;
                     case 5:
                         packetType5(p);
                         break;
                     case 6:
-                        newp = packetType6(p);
-                        queue.add(newp);
+                        packetType6(p);
                         break;
                     case 7:
                         packetType7(p);
@@ -54,12 +53,6 @@ public class ReceiverGateway implements Runnable {
                 }
 
                 System.out.println(servers.toString());
-
-                // Se tiver alguma coisa para reenviar para o FFS adiciona a queue
-
-                // Verificar o tipo de pacote de regresso e o utilizador a quem este se refere
-                // Dar output ao utilizador através do map guardado no userset
-
             } catch (Exception ignored) {
             }
         }
@@ -70,7 +63,7 @@ public class ReceiverGateway implements Runnable {
 
         int chuncks = Integer.parseInt(tokens[1]) / Packet.MAX_SIZE_DATA;
 
-        if(Integer.parseInt(tokens[1]) / Packet.MAX_SIZE_DATA > 0)
+        if(Integer.parseInt(tokens[1]) % Packet.MAX_SIZE_DATA > 0)
             chuncks++;
 
         users.setChunks(p.getIdUser(), chuncks);
@@ -87,16 +80,28 @@ public class ReceiverGateway implements Runnable {
         userFileSender.start();
     }
 
+    public void packetType3(Packet p) throws IOException {
+        Socket s = users.getSocket(p.getIdUser());
+        DataOutputStream out = new DataOutputStream(s.getOutputStream());
+
+        System.out.println("Ficheiro não existe");
+        out.flush();
+
+        out.close();
+        s.close();
+    }
+
     public void packetType5(Packet p) throws IOException {
         users.addFragment(p.getIdUser(), p);
     }
 
-    public Packet packetType6(Packet p) throws UnknownHostException {
+    public void packetType6(Packet p) throws UnknownHostException {
         if(!servers.isServer(p.getIpOrigem())) {
             servers.addServer(p.getPortaOrigem(), p.getIpOrigem());
         }
 
-        return new Packet(8, InetAddress.getLocalHost().getHostAddress(), p.getIpOrigem(), 8888, p.getPortaOrigem(), -1, 0, "Ligacao Estabelecida".getBytes(StandardCharsets.UTF_8));
+        Packet pnew = new Packet(8, InetAddress.getLocalHost().getHostAddress(), p.getIpOrigem(), 8888, p.getPortaOrigem(), -1, 0, "Ligacao Estabelecida".getBytes(StandardCharsets.UTF_8));
+        queue.add(pnew);
     }
 
     public void packetType7(Packet p) {

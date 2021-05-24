@@ -12,12 +12,14 @@ class ReceiverFFS implements Runnable {
     private PacketQueue pq;
     private String ipGateway;
     private int portaGateway;
+    private volatile boolean exit;
 
     public ReceiverFFS(DatagramSocket ds, PacketQueue pq, String ipGateway, int portaGateway) {
         this.ds = ds;
         this.pq = pq;
         this.ipGateway = ipGateway;
         this.portaGateway = portaGateway;
+        this.exit = false;
     }
 
     public void run() {
@@ -25,7 +27,7 @@ class ReceiverFFS implements Runnable {
             pq.add(packetType6());
         } catch (UnknownHostException ignored) { }
 
-        while (true) {
+        while (!exit) {
             try {
                 byte[] arr = new byte[Packet.MAX_SIZE_PACKET + 10]; //Acrescentamos 10 bytes apenas para proteção neste momento
                 DatagramPacket dp = new DatagramPacket(arr, arr.length);
@@ -58,6 +60,10 @@ class ReceiverFFS implements Runnable {
                 }
             } catch (IOException ignored) {}
         }
+    }
+
+    public void stop() {
+        exit = true;
     }
 
     public Packet packetType1(Packet p) throws IOException {

@@ -6,14 +6,16 @@ import java.net.InetAddress;
 class SenderFFS implements Runnable {
     private DatagramSocket ds;
     private PacketQueue pq;
+    private volatile boolean exit;
 
     public SenderFFS(DatagramSocket ds, PacketQueue pq) {
         this.ds = ds;
         this.pq = pq;
+        this.exit = false;
     }
 
     public void run() {
-        while(true) {
+        while(!exit) {
             try {
                 Packet p = pq.remove();
 
@@ -23,5 +25,9 @@ class SenderFFS implements Runnable {
                 ds.send(dp);
             } catch (IOException ignored) {}
         }
+    }
+
+    public void stop() {
+        exit = true;
     }
 }

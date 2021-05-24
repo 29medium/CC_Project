@@ -8,11 +8,13 @@ class PacketQueue {
     private LinkedList<Packet> packets;
     private ReentrantLock lock;
     private Condition con;
+    private Condition notEmpty;
 
     public PacketQueue() {
         packets = new LinkedList<>();
         lock = new ReentrantLock();
         con = lock.newCondition();
+        notEmpty = lock.newCondition();
     }
 
     public void add(Packet packet) {
@@ -43,6 +45,9 @@ class PacketQueue {
                     con.await();
             } catch (InterruptedException ignored){}
 
+            if(isEmpty())
+                notEmpty.signalAll();
+
             return packets.remove();
         } finally {
             lock.unlock();
@@ -53,6 +58,16 @@ class PacketQueue {
         lock.lock();
         try {
             return packets.isEmpty();
+        } finally {
+            lock.unlock();
+        }
+    }
+
+    public void notEmpty() throws InterruptedException {
+        lock.lock();
+        try {
+            while(!packets.isEmpty())
+                notEmpty.await();
         } finally {
             lock.unlock();
         }
