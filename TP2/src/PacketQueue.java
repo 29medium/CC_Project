@@ -45,10 +45,12 @@ class PacketQueue {
                     con.await();
             } catch (InterruptedException ignored){}
 
-            if(isEmpty())
+            Packet p = packets.remove();
+
+            if(packets.isEmpty())
                 notEmpty.signalAll();
 
-            return packets.remove();
+            return p;
         } finally {
             lock.unlock();
         }
