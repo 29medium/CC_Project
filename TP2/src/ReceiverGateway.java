@@ -67,7 +67,7 @@ public class ReceiverGateway implements Runnable {
     }
 
     public Packet packetType2(Packet p) throws UnknownHostException {
-        return new Packet(4, InetAddress.getLocalHost().getHostAddress(), p.getIpOrigem(), 8888, p.getPortaOrigem(), Packet.getIdTransferenciaCounter(), p.getIdUser(), 0, p.getData());
+        return new Packet(4, InetAddress.getLocalHost().getHostAddress(), p.getIpOrigem(), 8888, p.getPortaOrigem(), Gateway.getIdTransferenciaCounter(), p.getIdUser(), 0, p.getData());
     }
 
     public void packetType5(Packet p) throws IOException {
@@ -87,7 +87,7 @@ public class ReceiverGateway implements Runnable {
             servers.addServer(p.getPortaOrigem(), p.getIpOrigem());
         }
 
-        return new Packet(8, InetAddress.getLocalHost().getHostAddress(), p.getIpOrigem(), 8888, p.getPortaOrigem(), Packet.getIdTransferenciaCounter(), -1, 0, "Ligacao Estabelecida".getBytes(StandardCharsets.UTF_8));
+        return new Packet(8, InetAddress.getLocalHost().getHostAddress(), p.getIpOrigem(), 8888, p.getPortaOrigem(), Gateway.getIdTransferenciaCounter(), -1, 0, "Ligacao Estabelecida".getBytes(StandardCharsets.UTF_8));
     }
 
     public void packetType7(Packet p) {

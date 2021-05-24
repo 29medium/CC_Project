@@ -1,7 +1,11 @@
 import java.io.*;
 import java.net.*;
+import java.util.concurrent.locks.ReentrantLock;
 
 public class Gateway {
+    public static int id_counter=0;
+    private static ReentrantLock lock = new ReentrantLock();
+
     public static void main(String[] args) throws IOException {
         ServerSocket ss = new ServerSocket(8080);
         DatagramSocket ds = new DatagramSocket(8888);
@@ -32,8 +36,18 @@ public class Gateway {
             String[] tokens = userPacket.split(" ");
 
             ServerData sd = servers.getServer();
-            queue.add(new Packet(1, InetAddress.getLocalHost().getHostAddress(), sd.getIp(), 8888, sd.getPort(), Packet.getIdTransferenciaCounter(), userCounter-1, 0, tokens[1].getBytes()));
-            queue.getCon().signalAll();
+            queue.add(new Packet(1, InetAddress.getLocalHost().getHostAddress(), sd.getIp(), 8888, sd.getPort(), Gateway.getIdTransferenciaCounter(), userCounter-1, 0, tokens[1].getBytes()));
+
+            in.close();
+        }
+    }
+
+    public static int getIdTransferenciaCounter() {
+        lock.lock();
+        try {
+            return id_counter++;
+        }finally {
+            lock.unlock();
         }
     }
 }

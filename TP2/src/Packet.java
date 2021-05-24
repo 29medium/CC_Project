@@ -8,7 +8,6 @@ import java.util.concurrent.locks.ReentrantLock;
 public class Packet implements Serializable {
     public static final int MAX_SIZE_DATA = 1024;
     public static final int MAX_SIZE_PACKET = MAX_SIZE_DATA + 32;
-    public static int id_counter=0;
     private static ReentrantLock lock = new ReentrantLock();
     // 1 - Pergunta aos FFs se ficheiro existe | 2 - Responde que possui o ficheiro       | 3 - Responde que ficheiro nao existe
     // 4 - Pede ao FFs um ficheiro que possui  | 5 - Envia o ficheiro requisitado
@@ -144,14 +143,5 @@ public class Packet implements Serializable {
 
     public String getDataString() {
         return new String(data, StandardCharsets.UTF_8);
-    }
-
-    public static int getIdTransferenciaCounter() {
-        lock.lock();
-        try {
-            return id_counter++;
-        }finally {
-            lock.unlock();
-        }
     }
 }
