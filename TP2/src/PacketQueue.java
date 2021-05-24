@@ -14,6 +14,7 @@ class PacketQueue {
     public PacketQueue() {
         packets = new LinkedList<>();
         lock = new ReentrantLock();
+        lock2 = new ReentrantLock();
         con = lock.newCondition();
         notEmpty = lock2.newCondition();
     }
@@ -44,19 +45,19 @@ class PacketQueue {
             while (packets.isEmpty())
                 con.await();
 
-            Packet p = packets.remove();
-
-            lock2.lock();
-            try {
-                if (packets.isEmpty())
-                    notEmpty.signalAll();
-            } finally {
-                lock2.unlock();
-            }
-
-            return p;
+            return packets.remove();
         } finally {
             lock.unlock();
+        }
+    }
+
+    public void checkEmpty() {
+        lock2.lock();
+        try {
+            if (packets.isEmpty())
+                notEmpty.signalAll();
+        } finally {
+            lock2.unlock();
         }
     }
 
