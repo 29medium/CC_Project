@@ -78,6 +78,8 @@ public class ReceiverGateway implements Runnable {
         out.flush();
 
         out.close();
+        s.shutdownInput();
+        s.shutdownOutput();
         s.close();
         users.remove(p.getIdUser());
     }
