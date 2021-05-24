@@ -26,8 +26,6 @@ public class UserFileSender implements Runnable {
             out.flush();
 
             out.close();
-            s.shutdownInput();
-            s.shutdownOutput();
             s.close();
 
             users.remove(user_id);

@@ -70,7 +70,7 @@ public class ReceiverGateway implements Runnable {
 
         int chuncks = Integer.parseInt(tokens[1]) / Packet.MAX_SIZE_DATA;
 
-        if(Integer.parseInt(tokens[1]) / Packet.MAX_SIZE_DATA > 0)
+        if( (Integer.parseInt(tokens[1]) % Packet.MAX_SIZE_DATA) > 0)
             chuncks++;
 
         users.setChunks(p.getIdUser(), chuncks);
