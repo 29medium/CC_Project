@@ -37,13 +37,11 @@ class PacketQueue {
         }
     }
 
-    public Packet remove() {
+    public Packet remove() throws InterruptedException {
         lock.lock();
         try {
-            try {
-                while (isEmpty())
-                    con.await();
-            } catch (InterruptedException ignored){}
+            while (packets.isEmpty())
+                con.await();
 
             Packet p = packets.remove();
 
@@ -51,15 +49,6 @@ class PacketQueue {
                 notEmpty.signalAll();
 
             return p;
-        } finally {
-            lock.unlock();
-        }
-    }
-
-    public boolean isEmpty() {
-        lock.lock();
-        try {
-            return packets.isEmpty();
         } finally {
             lock.unlock();
         }
@@ -73,13 +62,5 @@ class PacketQueue {
         } finally {
             lock.unlock();
         }
-    }
-
-    public ReentrantLock getLock() {
-        return lock;
-    }
-
-    public Condition getCon() {
-        return con;
     }
 }

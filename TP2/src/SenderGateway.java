@@ -23,7 +23,7 @@ class SenderGateway implements Runnable {
                 DatagramPacket dp = new DatagramPacket(buf, buf.length, InetAddress.getByName(p.getIpDestino()), p.getPortaDestino());
 
                 ds.send(dp);
-            } catch (IOException ignored) {}
+            } catch (IOException | InterruptedException ignored) {}
         }
     }
 }
