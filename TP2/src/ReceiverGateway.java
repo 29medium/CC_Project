@@ -34,8 +34,7 @@ public class ReceiverGateway implements Runnable {
 
                 switch (p.getTipo()) {
                     case 2:
-                        newp = packetType2(p);
-                        queue.add(newp);
+                        packetType2(p);
                         break;
                     case 5:
                         packetType5(p);
@@ -66,22 +65,30 @@ public class ReceiverGateway implements Runnable {
         }
     }
 
-    public Packet packetType2(Packet p) throws UnknownHostException {
-        return new Packet(4, InetAddress.getLocalHost().getHostAddress(), p.getIpOrigem(), 8888, p.getPortaOrigem(), Gateway.getIdTransferenciaCounter(), p.getIdUser(), 0, p.getData());
+    public void packetType2(Packet p) throws UnknownHostException {
+        String[] tokens = p.getDataString().split("#SIZE#");
+
+        int chuncks = Integer.parseInt(tokens[1]) / Packet.MAX_SIZE_DATA;
+
+        if(Integer.parseInt(tokens[1]) / Packet.MAX_SIZE_DATA > 0)
+            chuncks++;
+
+        users.setChunks(p.getIdUser(), chuncks);
+
+        Packet pnew;
+        for(int i=0; i<chuncks; i++) {
+            ServerData sd = servers.getServer();
+            pnew = new Packet(4, InetAddress.getLocalHost().getHostAddress(), sd.getIp(), 8888, sd.getPort(), p.getIdUser(), i, tokens[0].getBytes());
+            queue.add(pnew);
+        }
+
+        // Criar um thread para verificar se ja recebeu os pacotes todos
+        Thread userFileSender = new Thread(new UserFileSender(users, p.getIdUser()));
+        userFileSender.start();
     }
 
     public void packetType5(Packet p) throws IOException {
-        Socket s = users.getSocket(p.getIdUser());
-        DataOutputStream out = new DataOutputStream(s.getOutputStream());
-
-        out.write(p.getData());
-        out.flush();
-
-        out.close();
-        s.shutdownInput();
-        s.shutdownOutput();
-        s.close();
-        users.remove(p.getIdUser());
+        users.addFragment(p.getIdUser(), p);
     }
 
     public Packet packetType6(Packet p) throws UnknownHostException {
@@ -89,7 +96,7 @@ public class ReceiverGateway implements Runnable {
             servers.addServer(p.getPortaOrigem(), p.getIpOrigem());
         }
 
-        return new Packet(8, InetAddress.getLocalHost().getHostAddress(), p.getIpOrigem(), 8888, p.getPortaOrigem(), Gateway.getIdTransferenciaCounter(), -1, 0, "Ligacao Estabelecida".getBytes(StandardCharsets.UTF_8));
+        return new Packet(8, InetAddress.getLocalHost().getHostAddress(), p.getIpOrigem(), 8888, p.getPortaOrigem(), -1, 0, "Ligacao Estabelecida".getBytes(StandardCharsets.UTF_8));
     }
 
     public void packetType7(Packet p) {

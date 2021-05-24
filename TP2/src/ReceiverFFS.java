@@ -52,7 +52,7 @@ class ReceiverFFS implements Runnable {
                         System.out.println("Conectado com sucesso");
                         break;
                     default:
-		                newp = new Packet(11,InetAddress.getLocalHost().getHostAddress(), ipGateway, 8888,portaGateway,Gateway.getIdTransferenciaCounter(),-1,0,"Erro em alguma coisa".getBytes(StandardCharsets.UTF_8));
+		                newp = new Packet(11,InetAddress.getLocalHost().getHostAddress(), ipGateway, 8888,portaGateway,-1,0,"Erro em alguma coisa".getBytes(StandardCharsets.UTF_8));
                         pq.add(newp);
 		                break;
                 }
@@ -61,24 +61,39 @@ class ReceiverFFS implements Runnable {
     }
 
     public Packet packetType1(Packet p) throws IOException {
-
 	    File file = new File("/home/core" + p.getDataString());
-
 	    // Pegar na data, tentar ir buscar o ficheiro
-        if (file.exists() && file.isFile())
-            return new Packet(2, InetAddress.getLocalHost().getHostAddress(),ipGateway,8888,portaGateway,Gateway.getIdTransferenciaCounter(),p.getIdUser(),0, p.getData()); // Se encontrar o ficheiro devolver tipo 2 e na data vai o ficheiro
+        if (file.exists() && file.isFile()) {
+            long size = file.length();
+            String data = p.getDataString() + "#SIZE#" + size;
+            return new Packet(2, InetAddress.getLocalHost().getHostAddress(), ipGateway, 8888, portaGateway, p.getIdUser(), 0, data.getBytes(StandardCharsets.UTF_8)); // Se encontrar o ficheiro devolver tipo 2 e na data vai o ficheiro
+        }
         else
-            return new Packet(3,InetAddress.getLocalHost().getHostAddress(),ipGateway,8888,portaGateway,Gateway.getIdTransferenciaCounter(),p.getIdUser(),0,"Ficheiro Nao Encontrado".getBytes(StandardCharsets.UTF_8));// Se não encontrar o ficheiro devolver tipo 3 e na data vai uma mensagem de erro
+            return new Packet(3,InetAddress.getLocalHost().getHostAddress(),ipGateway,8888,portaGateway,p.getIdUser(),0,"Ficheiro Nao Encontrado".getBytes(StandardCharsets.UTF_8));// Se não encontrar o ficheiro devolver tipo 3 e na data vai uma mensagem de erro
     }
 
     public Packet packetType4(Packet p) throws IOException {
         File file = new File("/home/core" + p.getDataString());
-        byte[] bytes = Files.readAllBytes(file.toPath());
-        return new Packet(5, InetAddress.getLocalHost().getHostAddress(),ipGateway,8888,portaGateway,Gateway.getIdTransferenciaCounter(),p.getIdUser(),0, bytes);
+
+        byte[] bytesFile = Files.readAllBytes(file.toPath());
+
+        int offset = p.getChucnkTransferencia() * Packet.MAX_SIZE_DATA;
+        int size = (int) file.length();
+        int chunkSize;
+
+        if((offset + Packet.MAX_SIZE_DATA) > size) {
+            chunkSize = size - offset;
+        }
+        else
+            chunkSize = Packet.MAX_SIZE_DATA;
+
+        byte[] bytesData = new byte[chunkSize];
+        System.arraycopy(bytesFile, offset, bytesData, 0, chunkSize);
+        return new Packet(5, InetAddress.getLocalHost().getHostAddress(),ipGateway,8888,portaGateway,p.getIdUser(),p.getChucnkTransferencia(), bytesData);
     }
 
     public Packet packetType6() throws UnknownHostException {
         // Ao iniciar uma ligação (quando esta thread é criada), o FFs informa o Gateway que se ligou a ele
-        return new Packet(6, InetAddress.getLocalHost().getHostAddress(), ipGateway, 8888, portaGateway, Gateway.getIdTransferenciaCounter(), -1, 0, "FFs pretende estabelecer ligaçao com o Gateway".getBytes(StandardCharsets.UTF_8));
+        return new Packet(6, InetAddress.getLocalHost().getHostAddress(), ipGateway, 8888, portaGateway, -1, 0, "FFs pretende estabelecer ligaçao com o Gateway".getBytes(StandardCharsets.UTF_8));
     }
 }

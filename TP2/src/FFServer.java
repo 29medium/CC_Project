@@ -28,7 +28,7 @@ public class FFServer {
         String pedido = reader.readLine();
         while (!pedido.equals("exit")) pedido = reader.readLine();
 
-        Packet pacoteEncerrarLigacao = new Packet(7, InetAddress.getLocalHost().getHostAddress(), ipGateway, 8888, portaGateway, Gateway.getIdTransferenciaCounter(), -1, 1, "FFs ira encerrar ligacao estabelecida".getBytes(StandardCharsets.UTF_8));
+        Packet pacoteEncerrarLigacao = new Packet(7, InetAddress.getLocalHost().getHostAddress(), ipGateway, 8888, portaGateway, -1, 1, "FFs ira encerrar ligacao estabelecida".getBytes(StandardCharsets.UTF_8));
         pq.add(pacoteEncerrarLigacao);
     }
 }
