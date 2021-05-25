@@ -11,7 +11,7 @@ public class Gateway {
         UserList users = new UserList();
         int userCounter=0; // cada user vai ter um id para guardar na userlist
 
-        System.out.println("Gateway conectou-se com o IP: " + InetAddress.getLocalHost().getAddress() + "\n");
+        System.out.println("Gateway conectou-se com o IP: " + InetAddress.getLocalHost().getHostAddress() + "\n");
 
         // Thread para receber do FFS
         Thread receiver = new Thread(new ReceiverGateway(ds, servers, queue, users));
