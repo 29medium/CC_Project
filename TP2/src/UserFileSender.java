@@ -18,11 +18,13 @@ public class UserFileSender implements Runnable {
             user.isFull();
 
             Socket s = user.getSocket();
-            BufferedWriter out = new BufferedWriter(new OutputStreamWriter(s.getOutputStream()));
+            BufferedOutputStream out = new BufferedOutputStream(s.getOutputStream());
 
-            for(int i=0; i<user.getChucks(); i++)
-                out.write(user.getDataChunk(i));
-            out.flush();
+            for(int i=0; i<user.getChucks(); i++) {
+                byte[] arr = user.getDataChunk(i);
+                out.write(arr, 0, arr.length);
+                out.flush();
+            }
 
             out.close();
             s.close();

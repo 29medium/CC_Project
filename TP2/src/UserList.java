@@ -82,10 +82,10 @@ class UserData {
         }
     }
 
-    public String getDataChunk(int chunk) {
+    public byte[] getDataChunk(int chunk) {
         lock.lock();
         try {
-            return fragments.get(chunk).getDataString();
+            return fragments.get(chunk).getData();
         } finally {
             lock.unlock();
         }

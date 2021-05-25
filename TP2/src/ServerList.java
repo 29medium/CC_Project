@@ -15,31 +15,58 @@ class ServerData {
     private int port;
     private String ip;
     private LocalTime lastUpdate;
+    private ReentrantLock lock;
 
     public ServerData(int port, String ip) {
         this.port = port;
         this.ip = ip;
         this.lastUpdate = LocalTime.now(ZoneId.of("UTC"));
+        this.lock = new ReentrantLock();
     }
 
     public String getIp() {
-        return this.ip;
+        lock.lock();
+        try {
+            return this.ip;
+        } finally {
+            lock.unlock();
+        }
     }
 
     public int getPort() {
-        return this.port;
+        lock.lock();
+        try {
+            return this.port;
+        } finally {
+            lock.unlock();
+        }
     }
 
     public String toString() {
-        return "port=" + port + ", ip='" + ip + '\'';
+        lock.lock();
+        try {
+            return "port=" + port + ", ip='" + ip + '\'';
+        } finally {
+            lock.unlock();
+        }
     }
 
     public LocalTime getLastUpdate() {
-        return this.lastUpdate;
+        lock.lock();
+        try {
+            return this.lastUpdate;
+        } finally {
+            lock.unlock();
+        }
     }
 
     public void updateTime() {
-        this.lastUpdate = LocalTime.now(ZoneId.of("UTC"));
+        lock.lock();
+        try {
+            this.lastUpdate = LocalTime.now(ZoneId.of("UTC"));
+        } finally {
+            lock.unlock();
+        }
     }
 }
 
@@ -121,6 +148,11 @@ public class ServerList {
     }
 
     public String toString() {
-        return "ServerList{" + "servers=" + servers.toString() + '}';
+        lock.lock();
+        try {
+            return "ServerList{" + "servers=" + servers.toString() + '}';
+        } finally {
+            lock.unlock();
+        }
     }
 }

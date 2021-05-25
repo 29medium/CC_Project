@@ -21,7 +21,7 @@ public class BeaconFFS implements Runnable{
 
         while(!FFServer.EXIT) {
             try {
-                pq.addFirst(new Packet(9, InetAddress.getLocalHost().getHostAddress(), ipGateway, 8888, portaGateway, -1, 0, "I'm Alive".getBytes(StandardCharsets.UTF_8)));
+                pq.add(new Packet(9, InetAddress.getLocalHost().getHostAddress(), ipGateway, 8888, portaGateway, -1, 0, "I'm Alive".getBytes(StandardCharsets.UTF_8)));
 
                 Thread.sleep(SLEEP_TIME);
             } catch (UnknownHostException | InterruptedException e) {}
