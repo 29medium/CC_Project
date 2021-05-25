@@ -5,10 +5,20 @@ import java.net.DatagramSocket;
 import java.net.InetAddress;
 import java.nio.charset.StandardCharsets;
 
+/**
+ * Classe que implementa o FFServer
+ */
 public class FFServer {
     public static boolean EXIT = false;
     public static String ROOTPATH = "/home/core";
 
+    /**
+     * Método que inicializa o FFServer
+     *
+     * @param args                  Argumentos para a conecção ao Gateway
+     * @throws IOException
+     * @throws InterruptedException
+     */
     public static void main(String[] args) throws IOException, InterruptedException {
         DatagramSocket ds = new DatagramSocket(8888);
         PacketQueue pq = new PacketQueue();
