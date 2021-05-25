@@ -6,7 +6,7 @@ public class BeaconFFS implements Runnable{
     private PacketQueue pq;
     private String ipGateway;
     private int portaGateway;
-    private final int SLEEP_TIME = 10000;
+    private final int SLEEP_TIME = 60000;
 
     public BeaconFFS(PacketQueue pq, String ipGateway, int portaGateway) {
         this.pq = pq;

@@ -62,7 +62,6 @@ class UserData {
         try {
             fragments.put(p.getChucnkTransferencia(), p);
 
-            if(fragments.size()==chuncks)
                 isFull.signalAll();
         } finally {
             lock.unlock();

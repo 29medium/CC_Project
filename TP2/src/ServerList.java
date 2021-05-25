@@ -135,7 +135,7 @@ public class ServerList {
         try {
             List <String> forRemove = new ArrayList<>();
             for(ServerData sa : servers.values())
-                if(sa.getLastUpdate().until(LocalTime.now(ZoneId.of("UTC")), ChronoUnit.SECONDS)>15)
+                if(sa.getLastUpdate().until(LocalTime.now(ZoneId.of("UTC")), ChronoUnit.SECONDS)>90)
                     forRemove.add(sa.getIp());
 
             for(String ip : forRemove) {
