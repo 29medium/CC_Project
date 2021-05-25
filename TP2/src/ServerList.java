@@ -1,3 +1,4 @@
+import java.beans.beancontext.BeanContext;
 import java.time.LocalTime;
 import java.time.ZoneId;
 import java.time.temporal.ChronoUnit;
@@ -131,7 +132,7 @@ public class ServerList {
         try {
             List <String> forRemove = new ArrayList<>();
             for(ServerData sa : servers.values())
-                if(sa.getLastUpdate().until(LocalTime.now(ZoneId.of("UTC")), ChronoUnit.SECONDS)>15)
+                if(sa.getLastUpdate().until(LocalTime.now(ZoneId.of("UTC")), ChronoUnit.SECONDS)>(BeaconGateway.SLEEP_TIME / 1000))
                     forRemove.add(sa.getIp());
 
             for(String ip : forRemove) {

@@ -3,7 +3,7 @@ import java.net.DatagramSocket;
 public class BeaconGateway implements Runnable{
     private DatagramSocket ds;
     private ServerList servers;
-    private final int SLEEP_TIME = 15000;
+    public static final long SLEEP_TIME = 15000;
 
     public BeaconGateway(DatagramSocket ds, ServerList servers) {
         this.ds = ds;
