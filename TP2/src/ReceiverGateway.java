@@ -1,48 +1,6 @@
 import java.io.*;
 import java.net.*;
 import java.nio.charset.StandardCharsets;
-import java.util.Set;
-
-class FragmentsRequester implements Runnable {
-    private PacketQueue queue;
-    private ServerList servers;
-    private UserList users;
-    private int idUser;
-    private int nrChuncks;
-    private String filename;
-
-    public FragmentsRequester(PacketQueue queue, ServerList servers, UserList users, int idUser, int nrChuncks, String filename) {
-        this.queue = queue;
-        this.servers = servers;
-        this.users = users;
-        this.idUser = idUser;
-        this.nrChuncks = nrChuncks;
-        this.filename = filename;
-    }
-
-    @Override
-    public void run() {
-        try {
-            boolean recievedAllPackages = false;
-
-            while (!recievedAllPackages) {
-
-                Packet pnew;
-                Set<Integer> remainingFragments = users.getUserData(idUser).getRemaingFragments();
-		
-		if(!remainingFragments.isEmpty()) {
-                	for (int i : remainingFragments) {
-                    		ServerData sd = servers.getServer();
-                    		pnew = new Packet(4, InetAddress.getLocalHost().getHostAddress(), sd.getIp(), 8888, sd.getPort(), idUser, i, filename.getBytes(StandardCharsets.UTF_8));
-                    		queue.add(pnew);
-                	}
-			Thread.sleep(5000);
-		}
-                recievedAllPackages = users.getUserData(idUser).noMoreFragments();
-            }
-        } catch (UnknownHostException | InterruptedException | NullPointerException ignored) { }
-    }
-}
 
 public class ReceiverGateway implements Runnable {
     private DatagramSocket ds;
@@ -68,8 +26,6 @@ public class ReceiverGateway implements Runnable {
                 System.arraycopy(dp.getData(), 0, conteudoPacote, 0, dp.getLength());
                 Packet p = new Packet(conteudoPacote); // Cria um pacote com as merdas recebidas do gateway
 
-                //System.out.println(p.toString());
-
                 switch (p.getTipo()) {
                     case 2:
                         packetType2(p);
@@ -92,8 +48,6 @@ public class ReceiverGateway implements Runnable {
                     default:
                         break;
                 }
-
-                System.out.println(servers.toString());
             } catch (Exception ignored) {
             }
         }
@@ -112,7 +66,7 @@ public class ReceiverGateway implements Runnable {
         users.addRemainingFragmentUser(p.getIdUser(), chuncks);
 
         // Criar um Thread para enviar os pedidos de Fragmentos
-        Thread fragmentsRequester = new Thread(new FragmentsRequester(queue, servers, users, p.getIdUser(), chuncks, tokens[0]));
+        Thread fragmentsRequester = new Thread(new FragmentsRequester(queue, servers, users, p.getIdUser(), tokens[0]));
         fragmentsRequester.start();
 
         // Criar um Thread para verificar se ja recebeu os pacotes todos
@@ -124,7 +78,7 @@ public class ReceiverGateway implements Runnable {
         Socket s = users.getSocket(p.getIdUser());
         BufferedWriter out = new BufferedWriter(new OutputStreamWriter(s.getOutputStream()));
 
-        System.out.println("Ficheiro não existe");
+        System.out.println("Ficheiro " + p.getDataString() + " não existe\n");
         out.write(" ");
         out.flush();
 
@@ -132,7 +86,7 @@ public class ReceiverGateway implements Runnable {
         s.close();
     }
 
-    public void packetType5(Packet p) throws IOException {
+    public void packetType5(Packet p) {
         users.addFragment(p.getIdUser(), p);
     }
 
@@ -141,6 +95,8 @@ public class ReceiverGateway implements Runnable {
             servers.addServer(p.getPortaOrigem(), p.getIpOrigem());
         }
 
+        System.out.println("FFS " + p.getIpOrigem() + " pediu para se conectar\n");
+
         Packet pnew = new Packet(8, InetAddress.getLocalHost().getHostAddress(), p.getIpOrigem(), 8888, p.getPortaOrigem(), -1, 0, "Ligacao Estabelecida".getBytes(StandardCharsets.UTF_8));
         queue.add(pnew);
     }
@@ -148,11 +104,15 @@ public class ReceiverGateway implements Runnable {
     public void packetType7(Packet p) throws UnknownHostException {
         servers.removeServer(p.getIpOrigem());
 
+        System.out.println("FFS " + p.getIpOrigem() + " pediu para se desconectar\n");
+
         Packet pnew = new Packet(10, InetAddress.getLocalHost().getHostAddress(), p.getIpOrigem(), 8888, p.getPortaOrigem(), -1, 0, "Coneccao encerrada".getBytes(StandardCharsets.UTF_8));
         queue.add(pnew);
     }
 
     public void packetType9(Packet p) {
         servers.updateTime(p.getIpOrigem());
+
+        System.out.println("Beacon do FFS " + p.getIpOrigem() + " recebido\n");
     }
 }

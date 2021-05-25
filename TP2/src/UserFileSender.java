@@ -26,6 +26,8 @@ public class UserFileSender implements Runnable {
                 out.flush();
             }
 
+            System.out.println("Ficheiro enviado ao utilizador\n");
+
             out.close();
             s.close();
 

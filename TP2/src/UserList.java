@@ -2,7 +2,6 @@ import java.net.Socket;
 import java.util.*;
 import java.util.concurrent.locks.Condition;
 import java.util.concurrent.locks.ReentrantLock;
-import java.util.stream.Collectors;
 
 class UserData {
     private int user_id;
@@ -192,6 +191,15 @@ public class UserList {
         try {
             for (int n = 0; n < nrChunks; n++)
                 users.get(i).addRemainingFragment(n);
+        } finally {
+            lock.unlock();
+        }
+    }
+
+    public boolean hasUser(int i) {
+        lock.lock();
+        try {
+            return users.get(i) != null;
         } finally {
             lock.unlock();
         }

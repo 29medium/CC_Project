@@ -5,12 +5,10 @@ import java.net.InetAddress;
 
 class SenderGateway implements Runnable {
     private DatagramSocket ds;
-    private final ServerList servers;
     private PacketQueue queue;
 
-    public SenderGateway(DatagramSocket ds, ServerList servers , PacketQueue queue) throws IOException {
+    public SenderGateway(DatagramSocket ds ,PacketQueue queue) {
         this.ds = ds;
-        this.servers = servers;
         this.queue = queue;
     }
 

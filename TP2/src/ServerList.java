@@ -1,15 +1,11 @@
-import java.net.Socket;
 import java.time.LocalTime;
 import java.time.ZoneId;
 import java.time.temporal.ChronoUnit;
-import java.time.temporal.TemporalUnit;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.locks.ReentrantLock;
-
-import static java.util.concurrent.TimeUnit.SECONDS;
 
 class ServerData {
     private int port;
@@ -140,7 +136,7 @@ public class ServerList {
 
             for(String ip : forRemove) {
                 removeServer(ip);
-                System.out.println("Servidor removido por idle: " + ip);
+                System.out.println("FFS " + ip + " removido por idle\n");
             }
         } finally {
             lock.unlock();

@@ -11,7 +11,7 @@ public class Packet implements Serializable {
     // 1 - Pergunta aos FFs se ficheiro existe | 2 - Responde que possui o ficheiro       | 3 - Responde que ficheiro nao existe
     // 4 - Pede ao FFs um ficheiro que possui  | 5 - Envia o ficheiro requisitado
     // 6 - FFs informa que se pretende ligar   | 7 - FFs informa que se pretende desligar | 8 - Gateway informa que FSs se ligou corretamente
-    // 9 - Gateway envia um Keep Alive         | 10- Gateway confirma que conexão foi cancelada
+    // 9 - Gateway envia um Keep Alive         | 10- Gateway confirma que conexão foi cancelada | 11 - Erro indeterminado
     private int tipo;
     private String ipOrigem;
     private String ipDestino;

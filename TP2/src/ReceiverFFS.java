@@ -37,7 +37,6 @@ class ReceiverFFS implements Runnable {
 
                 System.out.println(p.toString());
 
-                // Intrepreta e cria novo pacote após interpretação
                 Packet newp;
                 switch (p.getTipo()) {
                     case 1:
@@ -49,10 +48,10 @@ class ReceiverFFS implements Runnable {
                         pq.add(newp);
                         break;
                     case 8:
-                        System.out.println("Conectado com sucesso");
+                        System.out.println("Gateway confirmou conecção do FFS\n");
                         break;
                     case 10:
-                        System.out.println("Conecção encerrada");
+                        System.out.println("Gateway confirmou encerramento do FFS\n");
                         FFServer.EXIT = true;
                         break;
                     default:
@@ -65,7 +64,9 @@ class ReceiverFFS implements Runnable {
     }
 
     public Packet packetType1(Packet p) throws IOException {
-	    File file = new File("/home/core" + p.getDataString());
+	    File file = new File(FFServer.ROOTPATH + p.getDataString());
+
+        System.out.println("Gateway pediu informação do ficheiro: " + p.getDataString() + "\n");
 
         if (file.exists() && file.isFile()) {
             long size = file.length();
@@ -77,7 +78,9 @@ class ReceiverFFS implements Runnable {
     }
 
     public Packet packetType4(Packet p) throws IOException {
-        File file = new File("/home/core" + p.getDataString());
+        File file = new File(FFServer.ROOTPATH + p.getDataString());
+
+        System.out.println("Gateway pediu envio de um chunk do ficheiro " + p.getDataString() + "\n");
 
         byte[] bytesFile = Files.readAllBytes(file.toPath());
 

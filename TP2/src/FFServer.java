@@ -4,16 +4,19 @@ import java.io.InputStreamReader;
 import java.net.DatagramSocket;
 import java.net.InetAddress;
 import java.nio.charset.StandardCharsets;
+import java.util.Arrays;
 
 public class FFServer {
     public static boolean EXIT = false;
+    public static String ROOTPATH = "/home/core";
 
     public static void main(String[] args) throws IOException, InterruptedException {
         DatagramSocket ds = new DatagramSocket(8888);
         PacketQueue pq = new PacketQueue();
-
         String ipGateway = args[0];
         int portaGateway = Integer.parseInt(args[1]);
+
+        System.out.println("FFS conectou-se com o IP: " + Arrays.toString(InetAddress.getLocalHost().getAddress()) + "\n");
 
         Thread receiver = new Thread(new ReceiverFFS(ds, pq, ipGateway, portaGateway));
         Thread sender = new Thread(new SenderFFS(ds, pq));
@@ -31,6 +34,8 @@ public class FFServer {
 
         Packet pacoteEncerrarLigacao = new Packet(7, InetAddress.getLocalHost().getHostAddress(), ipGateway, 8888, portaGateway, -1, 1, "FFs ira encerrar ligacao estabelecida".getBytes(StandardCharsets.UTF_8));
         pq.addFirst(pacoteEncerrarLigacao);
+
+        System.out.println("Pedido de encerramento enviado ao Gateway");
 
         Thread.sleep(1000);
 
