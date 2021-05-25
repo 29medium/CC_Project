@@ -82,13 +82,10 @@ class UserData {
         }
     }
 
-    public String getDataFile() {
+    public String getDataChunk(int chunk) {
         lock.lock();
         try {
-            String data = "";
-            for(int i=0; i<chuncks; i++)
-                data += fragments.get(i).getDataString();
-            return data;
+            return fragments.get(chunk).getDataString();
         } finally {
             lock.unlock();
         }

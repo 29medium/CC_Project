@@ -1,5 +1,7 @@
+import java.io.BufferedWriter;
 import java.io.DataOutputStream;
 import java.io.IOException;
+import java.io.OutputStreamWriter;
 import java.net.*;
 import java.nio.charset.StandardCharsets;
 
@@ -82,9 +84,10 @@ public class ReceiverGateway implements Runnable {
 
     public void packetType3(Packet p) throws IOException {
         Socket s = users.getSocket(p.getIdUser());
-        DataOutputStream out = new DataOutputStream(s.getOutputStream());
+        BufferedWriter out = new BufferedWriter(new OutputStreamWriter(s.getOutputStream()));
 
         System.out.println("Ficheiro não existe");
+        out.write(" ");
         out.flush();
 
         out.close();

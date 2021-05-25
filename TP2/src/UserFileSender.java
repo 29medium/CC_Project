@@ -1,6 +1,4 @@
-import java.io.BufferedOutputStream;
-import java.io.DataOutputStream;
-import java.io.IOException;
+import java.io.*;
 import java.net.Socket;
 
 public class UserFileSender implements Runnable {
@@ -20,9 +18,10 @@ public class UserFileSender implements Runnable {
             user.isFull();
 
             Socket s = user.getSocket();
-            DataOutputStream out = new DataOutputStream(s.getOutputStream());
+            BufferedWriter out = new BufferedWriter(new OutputStreamWriter(s.getOutputStream()));
 
-            out.writeUTF(user.getDataFile());
+            for(int i=0; i<user.getChucks(); i++)
+                out.write(user.getDataChunk(i));
             out.flush();
 
             out.close();

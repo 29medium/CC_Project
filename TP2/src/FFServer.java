@@ -35,5 +35,7 @@ public class FFServer {
         Thread.sleep(1000);
 
         pq.signalCon();
+
+        System.exit(0);
     }
 }

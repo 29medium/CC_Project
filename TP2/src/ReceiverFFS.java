@@ -12,7 +12,6 @@ class ReceiverFFS implements Runnable {
     private PacketQueue pq;
     private String ipGateway;
     private int portaGateway;
-    private volatile boolean exit;
 
     public ReceiverFFS(DatagramSocket ds, PacketQueue pq, String ipGateway, int portaGateway) {
         this.ds = ds;
@@ -67,7 +66,7 @@ class ReceiverFFS implements Runnable {
 
     public Packet packetType1(Packet p) throws IOException {
 	    File file = new File("/home/core" + p.getDataString());
-	    // Pegar na data, tentar ir buscar o ficheiro
+
         if (file.exists() && file.isFile()) {
             long size = file.length();
             String data = p.getDataString() + "#SIZE#" + size;
@@ -98,7 +97,6 @@ class ReceiverFFS implements Runnable {
     }
 
     public Packet packetType6() throws UnknownHostException {
-        // Ao iniciar uma ligação (quando esta thread é criada), o FFs informa o Gateway que se ligou a ele
         return new Packet(6, InetAddress.getLocalHost().getHostAddress(), ipGateway, 8888, portaGateway, -1, 0, "FFs pretende estabelecer ligaçao com o Gateway".getBytes(StandardCharsets.UTF_8));
     }
 }
