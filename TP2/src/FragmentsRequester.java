@@ -48,7 +48,8 @@ public class FragmentsRequester implements Runnable {
                         pnew = new Packet(4, InetAddress.getLocalHost().getHostAddress(), sd.getIp(), 8888, sd.getPort(), idUser, i, filename.getBytes(StandardCharsets.UTF_8));
                         queue.add(pnew);
                     }
-                    Thread.sleep(1000);
+                    int sleep_time = ((remainingFragments.size()*Packet.MAX_SIZE_DATA) / 5000000) + 1;
+                    Thread.sleep((long) sleep_time * 1000);
                 }
                 if(users.hasUser(idUser))
                     recievedAllPackages = users.getUserData(idUser).noMoreFragments();
