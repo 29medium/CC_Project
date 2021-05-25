@@ -104,9 +104,9 @@ class ReceiverFFS implements Runnable {
      */
     public void packetType4(Packet p) throws IOException {
         String[] tokens = p.getDataString().split("#SIZE#");
-        File file = new File(FFServer.ROOTPATH + p.getDataString());
+        File file = new File(FFServer.ROOTPATH + tokens[0]);
 
-        System.out.println("Gateway pediu envio de um chunk do ficheiro " + p.getDataString() + "\n");
+        System.out.println("Gateway pediu envio de um chunk do ficheiro " + tokens[0] + "\n");
 
         byte[] bytesFile = Files.readAllBytes(file.toPath());
 
