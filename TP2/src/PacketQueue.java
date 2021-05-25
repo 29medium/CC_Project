@@ -59,6 +59,8 @@ class PacketQueue {
     public void signalCon() {
         lock.lock();
         try {
+            while(!packets.isEmpty());
+
             con.signalAll();
         } finally {
             lock.unlock();
