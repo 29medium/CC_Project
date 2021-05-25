@@ -19,7 +19,6 @@ class ReceiverFFS implements Runnable {
         this.pq = pq;
         this.ipGateway = ipGateway;
         this.portaGateway = portaGateway;
-        this.exit = false;
     }
 
     public void run() {
@@ -27,7 +26,7 @@ class ReceiverFFS implements Runnable {
             pq.add(packetType6());
         } catch (UnknownHostException ignored) { }
 
-        while (!exit) {
+        while (!FFServer.EXIT) {
             try {
                 byte[] arr = new byte[Packet.MAX_SIZE_PACKET + 10]; //Acrescentamos 10 bytes apenas para proteção neste momento
                 DatagramPacket dp = new DatagramPacket(arr, arr.length);
@@ -55,7 +54,7 @@ class ReceiverFFS implements Runnable {
                         break;
                     case 10:
                         System.out.println("Conecção encerrada");
-                        exit = true;
+                        FFServer.EXIT = true;
                         break;
                     default:
 		                newp = new Packet(11,InetAddress.getLocalHost().getHostAddress(), ipGateway, 8888,portaGateway,-1,0,"Erro em alguma coisa".getBytes(StandardCharsets.UTF_8));

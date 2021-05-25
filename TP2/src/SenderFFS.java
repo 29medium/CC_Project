@@ -20,7 +20,7 @@ class SenderFFS implements Runnable {
     }
 
     public void run() {
-        while(!exit || !pq.isEmpty()) {
+        while(!FFServer.EXIT || !pq.isEmpty()) {
             try {
                 Packet p = pq.remove();
 
