@@ -6,7 +6,7 @@ public class BeaconFFS implements Runnable{
     private PacketQueue pq;
     private String ipGateway;
     private int portaGateway;
-    private final int SLEEP_TIME = 60000;
+    private final int SLEEP_TIME = 10000;
 
     public BeaconFFS(PacketQueue pq, String ipGateway, int portaGateway) {
         this.pq = pq;
@@ -21,7 +21,7 @@ public class BeaconFFS implements Runnable{
 
         while(!FFServer.EXIT) {
             try {
-                pq.add(new Packet(9, InetAddress.getLocalHost().getHostAddress(), ipGateway, 8888, portaGateway, -1, 0, "I'm Alive".getBytes(StandardCharsets.UTF_8)));
+                pq.addFirst(new Packet(9, InetAddress.getLocalHost().getHostAddress(), ipGateway, 8888, portaGateway, -1, 0, "I'm Alive".getBytes(StandardCharsets.UTF_8)));
 
                 Thread.sleep(SLEEP_TIME);
             } catch (UnknownHostException | InterruptedException e) {}

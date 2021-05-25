@@ -191,7 +191,7 @@ public class UserList {
         lock.lock();
         try {
             for (int n = 0; n < nrChunks; n++)
-                users.get(i).addRemainingFragment(i);
+                users.get(i).addRemainingFragment(n);
         } finally {
             lock.unlock();
         }

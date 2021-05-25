@@ -28,19 +28,19 @@ class FragmentsRequester implements Runnable {
             while (!recievedAllPackages) {
 
                 Packet pnew;
-                Set<Integer> remaingFragments = users.getUserData(idUser).getRemaingFragments();
-
-                for (int i : remaingFragments) {
-                    ServerData sd = servers.getServer();
-                    pnew = new Packet(4, InetAddress.getLocalHost().getHostAddress(), sd.getIp(), 8888, sd.getPort(), idUser, i, filename.getBytes(StandardCharsets.UTF_8));
-                    queue.add(pnew);
-                }
-
+                Set<Integer> remainingFragments = users.getUserData(idUser).getRemaingFragments();
+		
+		if(!remainingFragments.isEmpty()) {
+                	for (int i : remainingFragments) {
+                    		ServerData sd = servers.getServer();
+                    		pnew = new Packet(4, InetAddress.getLocalHost().getHostAddress(), sd.getIp(), 8888, sd.getPort(), idUser, i, filename.getBytes(StandardCharsets.UTF_8));
+                    		queue.add(pnew);
+                	}
+			Thread.sleep(5000);
+		}
                 recievedAllPackages = users.getUserData(idUser).noMoreFragments();
             }
-        } catch (UnknownHostException e) {
-            e.printStackTrace();
-        }
+        } catch (UnknownHostException | InterruptedException | NullPointerException ignored) { }
     }
 }
 
@@ -68,7 +68,7 @@ public class ReceiverGateway implements Runnable {
                 System.arraycopy(dp.getData(), 0, conteudoPacote, 0, dp.getLength());
                 Packet p = new Packet(conteudoPacote); // Cria um pacote com as merdas recebidas do gateway
 
-                System.out.println(p.toString());
+                //System.out.println(p.toString());
 
                 switch (p.getTipo()) {
                     case 2:
