@@ -23,7 +23,7 @@ public class FragmentsRequester implements Runnable {
         try {
             boolean recievedAllPackages = false;
 
-            System.out.println("Chunks para o ficheiro " + filename + " pedidos ao FFS\n");
+            System.out.println("Chunks para o ficheiro " + filename + " pedidos aos FFSs\n");
 
             while (!recievedAllPackages) {
                 Packet pnew;

@@ -25,7 +25,7 @@ class SenderFFS implements Runnable {
                 Packet p = pq.remove();
 
                 if(!FFServer.EXIT) {
-                    byte[] buf = p.packetToBytes();
+                    byte[] buf = p.packetToBytes(p.getIpDestino());
                     DatagramPacket dp = new DatagramPacket(buf, buf.length, InetAddress.getByName(p.getIpDestino()), p.getPortaDestino());
 
                     ds.send(dp);

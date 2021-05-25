@@ -24,7 +24,7 @@ public class ReceiverGateway implements Runnable {
 
                 byte[] conteudoPacote = new byte[dp.getLength()];
                 System.arraycopy(dp.getData(), 0, conteudoPacote, 0, dp.getLength());
-                Packet p = new Packet(conteudoPacote); // Cria um pacote com as merdas recebidas do gateway
+                Packet p = new Packet(conteudoPacote, InetAddress.getLocalHost().getHostAddress()); // Cria um pacote com as merdas recebidas do gateway
 
                 switch (p.getTipo()) {
                     case 2:

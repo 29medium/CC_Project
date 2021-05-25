@@ -17,7 +17,7 @@ class SenderGateway implements Runnable {
             try {
                 Packet p = queue.remove();
 
-                byte[] buf = p.packetToBytes();
+                byte[] buf = p.packetToBytes(p.getIpDestino());
                 DatagramPacket dp = new DatagramPacket(buf, buf.length, InetAddress.getByName(p.getIpDestino()), p.getPortaDestino());
 
                 ds.send(dp);

@@ -1,9 +1,16 @@
+import javax.crypto.BadPaddingException;
+import javax.crypto.Cipher;
+import javax.crypto.IllegalBlockSizeException;
+import javax.crypto.NoSuchPaddingException;
+import javax.crypto.spec.SecretKeySpec;
 import java.io.Serializable;
+import java.io.UnsupportedEncodingException;
 import java.net.InetAddress;
 import java.net.UnknownHostException;
 import java.nio.ByteBuffer;
 import java.nio.charset.StandardCharsets;
-import java.util.concurrent.locks.ReentrantLock;
+import java.security.InvalidKeyException;
+import java.security.NoSuchAlgorithmException;
 
 public class Packet implements Serializable {
     public static final int MAX_SIZE_DATA = 4096;
@@ -32,52 +39,62 @@ public class Packet implements Serializable {
         this.data = data;
     }
 
-    public Packet (byte[] arrayBytes) throws UnknownHostException {
-        byte[] auxiliar = new byte[4];
+    public Packet (byte[] conteudo, String key) throws UnknownHostException {
+        try {
+            byte[] arrayBytes;
+            arrayBytes = decrypt(conteudo, key);
 
-        this.tipo = ByteBuffer.wrap(arrayBytes,0,4).getInt();
+            byte[] auxiliar = new byte[4];
 
-        System.arraycopy(arrayBytes, 4, auxiliar, 0, 4);
-        this.ipOrigem = InetAddress.getByAddress(auxiliar).getHostAddress();
+            this.tipo = ByteBuffer.wrap(arrayBytes,0,4).getInt();
 
-        System.arraycopy(arrayBytes, 8, auxiliar, 0, 4);
-        this.ipDestino = InetAddress.getByAddress(auxiliar).getHostAddress();
+            System.arraycopy(arrayBytes, 4, auxiliar, 0, 4);
+            this.ipOrigem = InetAddress.getByAddress(auxiliar).getHostAddress();
 
-        this.portaOrigem = ByteBuffer.wrap(arrayBytes,12,4).getInt();
-        this.portaDestino = ByteBuffer.wrap(arrayBytes,16,4).getInt();
-        this.idUser = ByteBuffer.wrap(arrayBytes,20,4).getInt();
-        this.chucnkTransferencia = ByteBuffer.wrap(arrayBytes,24,4).getInt();
+            System.arraycopy(arrayBytes, 8, auxiliar, 0, 4);
+            this.ipDestino = InetAddress.getByAddress(auxiliar).getHostAddress();
 
-        byte[] newData = new byte[arrayBytes.length - 28];
-        System.arraycopy(arrayBytes, 28, newData, 0, arrayBytes.length-28);
-        this.data = newData;
+            this.portaOrigem = ByteBuffer.wrap(arrayBytes,12,4).getInt();
+            this.portaDestino = ByteBuffer.wrap(arrayBytes,16,4).getInt();
+            this.idUser = ByteBuffer.wrap(arrayBytes,20,4).getInt();
+            this.chucnkTransferencia = ByteBuffer.wrap(arrayBytes,24,4).getInt();
+
+            byte[] newData = new byte[arrayBytes.length - 28];
+            System.arraycopy(arrayBytes, 28, newData, 0, arrayBytes.length-28);
+            this.data = newData;
+
+        } catch (Exception ignored) { }
     }
 
 
-    byte[] packetToBytes () throws UnknownHostException {
-        byte[] pacoteEmBytes = new byte[28 + this.data.length];
+    byte[] packetToBytes (String key) throws UnknownHostException {
+        try {
+            byte[] pacoteEmBytes = new byte[28 + this.data.length];
 
-        byte[] tipo = convertIntToByteArray(this.tipo);
-        System.arraycopy(tipo,0,pacoteEmBytes,0,4);
-        byte[] ipOrigem = InetAddress.getByName(this.ipOrigem).getAddress();
-        System.arraycopy(ipOrigem,0,pacoteEmBytes,4,4);
-        byte[] ipDestino = InetAddress.getByName(this.ipDestino).getAddress();
-        System.arraycopy(ipDestino,0,pacoteEmBytes,8,4);
-        byte[] portaOrigem = convertIntToByteArray(this.portaOrigem);
-        System.arraycopy(portaOrigem,0,pacoteEmBytes,12,4);
-        byte[] portaDestino = convertIntToByteArray(this.portaDestino);
-        System.arraycopy(portaDestino,0,pacoteEmBytes,16,4);
-        byte[] idUser = convertIntToByteArray(this.idUser);
-        System.arraycopy(idUser,0,pacoteEmBytes,20,4);
-        byte[] chucnkTransferencia = convertIntToByteArray(this.chucnkTransferencia);
-        System.arraycopy(chucnkTransferencia,0,pacoteEmBytes,24,4);
-        System.arraycopy(this.data,0,pacoteEmBytes,28,this.data.length);
+            byte[] tipo = convertIntToByteArray(this.tipo);
+            System.arraycopy(tipo,0,pacoteEmBytes,0,4);
+            byte[] ipOrigem = InetAddress.getByName(this.ipOrigem).getAddress();
+            System.arraycopy(ipOrigem,0,pacoteEmBytes,4,4);
+            byte[] ipDestino = InetAddress.getByName(this.ipDestino).getAddress();
+            System.arraycopy(ipDestino,0,pacoteEmBytes,8,4);
+            byte[] portaOrigem = convertIntToByteArray(this.portaOrigem);
+            System.arraycopy(portaOrigem,0,pacoteEmBytes,12,4);
+            byte[] portaDestino = convertIntToByteArray(this.portaDestino);
+            System.arraycopy(portaDestino,0,pacoteEmBytes,16,4);
+            byte[] idUser = convertIntToByteArray(this.idUser);
+            System.arraycopy(idUser,0,pacoteEmBytes,20,4);
+            byte[] chucnkTransferencia = convertIntToByteArray(this.chucnkTransferencia);
+            System.arraycopy(chucnkTransferencia,0,pacoteEmBytes,24,4);
+            System.arraycopy(this.data,0,pacoteEmBytes,28,this.data.length);
 
-        return pacoteEmBytes;
+            return encrypt(pacoteEmBytes, key);
+        } catch (Exception ignored) { }
+
+        return null;
     }
 
 
-    byte[] convertIntToByteArray (int inteiro) {
+    private byte[] convertIntToByteArray (int inteiro) {
         ByteBuffer byteBuffer = ByteBuffer.allocate(4);
         byteBuffer.putInt(inteiro);
         return byteBuffer.array();
@@ -132,5 +149,19 @@ public class Packet implements Serializable {
 
     public String getDataString() {
         return new String(data, StandardCharsets.UTF_8);
+    }
+
+    private byte[] encrypt(byte[] message, String key) throws NoSuchPaddingException, NoSuchAlgorithmException, BadPaddingException, IllegalBlockSizeException, InvalidKeyException, UnsupportedEncodingException {
+        Cipher cipher = Cipher.getInstance("AES/CBC/PKCS5Padding");
+        SecretKeySpec secretKey = new SecretKeySpec(key.getBytes("UTF-8"), "AES");
+        cipher.init(Cipher.ENCRYPT_MODE, secretKey);
+        return cipher.doFinal(message);
+    }
+
+    private byte[] decrypt(byte[] message, String key) throws NoSuchPaddingException, NoSuchAlgorithmException, BadPaddingException, IllegalBlockSizeException, InvalidKeyException, UnsupportedEncodingException {
+        Cipher cipher = Cipher.getInstance("AES/CBC/PKCS5Padding");
+        SecretKeySpec secretKey = new SecretKeySpec(key.getBytes("UTF-8"), "AES");
+        cipher.init(Cipher.DECRYPT_MODE, secretKey);
+        return cipher.doFinal(message);
     }
 }
