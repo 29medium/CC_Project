@@ -1,4 +1,7 @@
+import java.io.BufferedOutputStream;
+import java.io.IOException;
 import java.net.InetAddress;
+import java.net.Socket;
 import java.net.UnknownHostException;
 import java.nio.charset.StandardCharsets;
 import java.util.Set;
@@ -38,9 +41,11 @@ public class FragmentsRequester implements Runnable {
 
             System.out.println("Chunks para o ficheiro " + filename + " pedidos aos FFSs\n");
 
+            UserData user = users.getUserData(idUser);
+
             while (!recievedAllPackages) {
                 Packet pnew;
-                Set<Integer> remainingFragments = users.getUserData(idUser).getRemaingFragments();
+                Set<Integer> remainingFragments = user.getRemaingFragments();
 
                 if (!remainingFragments.isEmpty()) {
                     for (int i : remainingFragments) {
@@ -51,12 +56,24 @@ public class FragmentsRequester implements Runnable {
                     int sleep_time = ((remainingFragments.size()*Packet.MAX_SIZE_DATA) / 5000000) + 1;
                     Thread.sleep((long) sleep_time * 1000);
                 }
-                if(users.hasUser(idUser))
-                    recievedAllPackages = users.getUserData(idUser).noMoreFragments();
-                else
-                    recievedAllPackages = true;
+                recievedAllPackages = user.noMoreFragments();
             }
-        } catch (UnknownHostException | InterruptedException ignored) {
-        }
+
+            Socket s = user.getSocket();
+            BufferedOutputStream out = new BufferedOutputStream(s.getOutputStream());
+
+            for(int i=0; i<user.getChucks(); i++) {
+                byte[] arr = user.getDataChunk(i);
+                out.write(arr, 0, arr.length);
+                out.flush();
+            }
+
+            System.out.println("Ficheiro enviado ao utilizador\n");
+
+            out.close();
+            s.close();
+
+            users.remove(idUser);
+        } catch (InterruptedException | IOException ignored) { }
     }
 }

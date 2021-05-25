@@ -84,13 +84,8 @@ public class ReceiverGateway implements Runnable {
 
         users.addRemainingFragmentUser(p.getIdUser(), chuncks);
 
-        // Criar um Thread para enviar os pedidos de Fragmentos
         Thread fragmentsRequester = new Thread(new FragmentsRequester(queue, servers, users, p.getIdUser(), tokens[0]));
         fragmentsRequester.start();
-
-        // Criar um Thread para verificar se ja recebeu os pacotes todos
-        Thread userFileSender = new Thread(new UserFileSender(users, p.getIdUser()));
-        userFileSender.start();
     }
 
     /**
