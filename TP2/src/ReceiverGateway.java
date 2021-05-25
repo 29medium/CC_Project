@@ -84,7 +84,7 @@ public class ReceiverGateway implements Runnable {
 
         users.addRemainingFragmentUser(p.getIdUser(), chuncks);
 
-        Thread fragmentsRequester = new Thread(new FragmentsRequester(queue, servers, users, p.getIdUser(), tokens[0]));
+        Thread fragmentsRequester = new Thread(new FragmentsRequester(queue, servers, users, p.getIdUser(), p.getDataString()));
         fragmentsRequester.start();
     }
 

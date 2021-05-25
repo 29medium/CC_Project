@@ -1,4 +1,5 @@
 import java.io.File;
+import java.io.FileInputStream;
 import java.io.IOException;
 import java.net.DatagramPacket;
 import java.net.DatagramSocket;
@@ -102,14 +103,15 @@ class ReceiverFFS implements Runnable {
      * @throws IOException
      */
     public void packetType4(Packet p) throws IOException {
-        File file = new File(FFServer.ROOTPATH + p.getDataString());
+        String[] tokens = p.getDataString().split("#SIZE#");
+        //File file = new File(FFServer.ROOTPATH + p.getDataString());
 
         System.out.println("Gateway pediu envio de um chunk do ficheiro " + p.getDataString() + "\n");
 
-        byte[] bytesFile = Files.readAllBytes(file.toPath());
+        //byte[] bytesFile = Files.readAllBytes(file.toPath());
 
         int offset = p.getChucnkTransferencia() * Packet.MAX_SIZE_DATA;
-        int size = (int) file.length();
+        int size = Integer.parseInt(tokens[1]);
         int chunkSize;
 
         if((offset + Packet.MAX_SIZE_DATA) > size) {
@@ -119,7 +121,11 @@ class ReceiverFFS implements Runnable {
             chunkSize = Packet.MAX_SIZE_DATA;
 
         byte[] bytesData = new byte[chunkSize];
-        System.arraycopy(bytesFile, offset, bytesData, 0, chunkSize);
+        //System.arraycopy(bytesFile, offset, bytesData, 0, chunkSize);
+
+        FileInputStream fis = new FileInputStream(FFServer.ROOTPATH + tokens[0]);
+        fis.read(bytesData, offset, chunkSize);
+
         pq.add(new Packet(5, InetAddress.getLocalHost().getHostAddress(),ipGateway,8888,portaGateway,p.getIdUser(),p.getChucnkTransferencia(), bytesData));
     }
 

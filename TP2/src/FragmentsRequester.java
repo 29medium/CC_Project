@@ -14,7 +14,7 @@ public class FragmentsRequester implements Runnable {
     private ServerList servers;
     private UserList users;
     private int idUser;
-    private String filename;
+    private String payload;
 
     /**
      * Construtor do FragmentRequester
@@ -22,14 +22,14 @@ public class FragmentsRequester implements Runnable {
      * @param servers   Classe onde constam informações sobre os vários servidores FFS conectados
      * @param users     Classe onde constam informações sobre os vários Users que efeturam pedidos ao Gateway
      * @param idUser    id do User que pediu um dado ficheiro (sobre o qual estamos a pedir os chuncks aos FFSs)
-     * @param filename  nome do ficheiro pedido pelo User
+     * @param payload   payload a enviar
      */
-    public FragmentsRequester(PacketQueue queue, ServerList servers, UserList users, int idUser, String filename) {
+    public FragmentsRequester(PacketQueue queue, ServerList servers, UserList users, int idUser, String payload) {
         this.queue = queue;
         this.servers = servers;
         this.users = users;
         this.idUser = idUser;
-        this.filename = filename;
+        this.payload = payload;
     }
 
     /**
@@ -39,7 +39,8 @@ public class FragmentsRequester implements Runnable {
         try {
             boolean recievedAllPackages = false;
 
-            System.out.println("Chunks para o ficheiro " + filename + " pedidos aos FFSs\n");
+            String[] tokens = payload.split("#SIZE#");
+            System.out.println("Chunks para o ficheiro " + tokens[0] + " pedidos aos FFSs\n");
 
             UserData user = users.getUserData(idUser);
 
@@ -50,7 +51,7 @@ public class FragmentsRequester implements Runnable {
                 if (!remainingFragments.isEmpty()) {
                     for (int i : remainingFragments) {
                         ServerData sd = servers.getServer();
-                        pnew = new Packet(4, InetAddress.getLocalHost().getHostAddress(), sd.getIp(), 8888, sd.getPort(), idUser, i, filename.getBytes(StandardCharsets.UTF_8));
+                        pnew = new Packet(4, InetAddress.getLocalHost().getHostAddress(), sd.getIp(), 8888, sd.getPort(), idUser, i, payload.getBytes(StandardCharsets.UTF_8));
                         queue.add(pnew);
                     }
                     int sleep_time = ((remainingFragments.size()*Packet.MAX_SIZE_DATA) / 5000000) + 1;
