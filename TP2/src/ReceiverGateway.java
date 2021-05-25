@@ -2,12 +2,22 @@ import java.io.*;
 import java.net.*;
 import java.nio.charset.StandardCharsets;
 
+/**
+ * Classe que implementa o RecieverGateway, onde são recebidos pacotes dos diferentes servidores FFS
+ */
 public class ReceiverGateway implements Runnable {
     private DatagramSocket ds;
     private PacketQueue queue;
     private ServerList servers;
     private UserList users;
 
+    /**
+     * Construtor do RecieverGateway
+     * @param ds        DatagramSocket onde pacotes são recebidos dos servidores
+     * @param servers   Classe onde constam informações sobre os vários servidores FFS conectados
+     * @param queue     Queue de pacotes onde vamos inrtoduzir os pacotes a serem enviados
+     * @param users     Classe onde constam informações sobre os vários Users que efeturam pedidos ao Gateway
+     */
     public ReceiverGateway(DatagramSocket ds, ServerList servers, PacketQueue queue, UserList users){
         this.ds = ds;
         this.queue = queue;
@@ -15,6 +25,9 @@ public class ReceiverGateway implements Runnable {
         this.users = users;
     }
 
+    /**
+     * Método que executa a Thread
+     */
     public void run() {
         while(true) {
             try {
@@ -53,6 +66,12 @@ public class ReceiverGateway implements Runnable {
         }
     }
 
+
+    /**
+     * Método que processa o pacote do tipo 2
+     * @param p                         Pacote do tipo 2
+     * @throws UnknownHostException
+     */
     public void packetType2(Packet p) throws UnknownHostException {
         String[] tokens = p.getDataString().split("#SIZE#");
 
@@ -74,6 +93,11 @@ public class ReceiverGateway implements Runnable {
         userFileSender.start();
     }
 
+    /**
+     * Método que processa o pacote do tipo 3
+     * @param p                         Pacote do tipo 3
+     * @throws UnknownHostException
+     */
     public void packetType3(Packet p) throws IOException {
         Socket s = users.getSocket(p.getIdUser());
         BufferedWriter out = new BufferedWriter(new OutputStreamWriter(s.getOutputStream()));
@@ -86,10 +110,20 @@ public class ReceiverGateway implements Runnable {
         s.close();
     }
 
+    /**
+     * Método que processa o pacote do tipo 5
+     * @param p                         Pacote do tipo 5
+     * @throws UnknownHostException
+     */
     public void packetType5(Packet p) {
         users.addFragment(p.getIdUser(), p);
     }
 
+    /**
+     * Método que processa o pacote do tipo 6
+     * @param p                         Pacote do tipo 6
+     * @throws UnknownHostException
+     */
     public void packetType6(Packet p) throws UnknownHostException {
         if(!servers.isServer(p.getIpOrigem())) {
             servers.addServer(p.getPortaOrigem(), p.getIpOrigem());
@@ -101,6 +135,11 @@ public class ReceiverGateway implements Runnable {
         queue.add(pnew);
     }
 
+    /**
+     * Método que processa o pacote do tipo 7
+     * @param p                         Pacote do tipo 7
+     * @throws UnknownHostException
+     */
     public void packetType7(Packet p) throws UnknownHostException {
         servers.removeServer(p.getIpOrigem());
 
@@ -110,6 +149,11 @@ public class ReceiverGateway implements Runnable {
         queue.add(pnew);
     }
 
+    /**
+     * Método que processa o pacote do tipo 9
+     * @param p                         Pacote do tipo 9
+     * @throws UnknownHostException
+     */
     public void packetType9(Packet p) {
         servers.updateTime(p.getIpOrigem());
 
