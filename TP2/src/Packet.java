@@ -14,7 +14,7 @@ import java.util.Arrays;
 public class Packet implements Serializable {
     public static final int MAX_SIZE_DATA = 4096;
     public static final int MAX_SIZE_PACKET = MAX_SIZE_DATA + 28;
-    public static final String ENCRIPTION_KEY = "cc14";
+    public static final String ENCRIPTION_KEY = "CC21-TP2-Grupo14";
 
     // 1 - Pergunta aos FFs se ficheiro existe | 2 - Responde que possui o ficheiro       | 3 - Responde que ficheiro nao existe
     // 4 - Pede ao FFs um ficheiro que possui  | 5 - Envia o ficheiro requisitado
