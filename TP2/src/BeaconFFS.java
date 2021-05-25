@@ -9,7 +9,7 @@ public class BeaconFFS implements Runnable{
     private PacketQueue pq;
     private String ipGateway;
     private int portaGateway;
-    private final int SLEEP_TIME = 10000;
+    private final int SLEEP_TIME = 5000;
 
     /**
      * Construtor da classe BeaconFFS
