@@ -6,17 +6,10 @@ import java.net.InetAddress;
 class SenderFFS implements Runnable {
     private DatagramSocket ds;
     private PacketQueue pq;
-    private volatile boolean exit;
 
     public SenderFFS(DatagramSocket ds, PacketQueue pq) {
         this.ds = ds;
         this.pq = pq;
-        this.exit = false;
-    }
-
-    @Deprecated
-    public void stop() {
-        exit = true;
     }
 
     public void run() {

@@ -1,15 +1,10 @@
 import javax.crypto.*;
 import javax.crypto.spec.SecretKeySpec;
-import java.io.DataOutputStream;
 import java.io.Serializable;
-import java.io.UnsupportedEncodingException;
 import java.net.InetAddress;
 import java.net.UnknownHostException;
 import java.nio.ByteBuffer;
 import java.nio.charset.StandardCharsets;
-import java.security.InvalidKeyException;
-import java.security.NoSuchAlgorithmException;
-import java.util.Arrays;
 
 public class Packet implements Serializable {
     public static final int MAX_SIZE_DATA = 4096;
@@ -85,7 +80,6 @@ public class Packet implements Serializable {
         System.arraycopy(chucnkTransferencia,0,pacoteEmBytes,24,4);
         System.arraycopy(this.data,0,pacoteEmBytes,28,this.data.length);
 
-        System.out.println(Arrays.toString(encrypt(pacoteEmBytes)));
         return encrypt(pacoteEmBytes);
     }
 
