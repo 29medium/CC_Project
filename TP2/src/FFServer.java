@@ -4,7 +4,6 @@ import java.io.InputStreamReader;
 import java.net.DatagramSocket;
 import java.net.InetAddress;
 import java.nio.charset.StandardCharsets;
-import java.util.Arrays;
 
 public class FFServer {
     public static boolean EXIT = false;
@@ -35,7 +34,7 @@ public class FFServer {
         Packet pacoteEncerrarLigacao = new Packet(7, InetAddress.getLocalHost().getHostAddress(), ipGateway, 8888, portaGateway, -1, 1, "FFs ira encerrar ligacao estabelecida".getBytes(StandardCharsets.UTF_8));
         pq.addFirst(pacoteEncerrarLigacao);
 
-        System.out.println("Pedido de encerramento enviado ao Gateway");
+        System.out.println("Pedido de encerramento enviado ao Gateway\n");
 
         Thread.sleep(1000);
 

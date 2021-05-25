@@ -79,7 +79,7 @@ public class ReceiverGateway implements Runnable {
         BufferedWriter out = new BufferedWriter(new OutputStreamWriter(s.getOutputStream()));
 
         System.out.println("Ficheiro " + p.getDataString() + " não existe\n");
-        out.write(" ");
+        out.write("File not found\n");
         out.flush();
 
         out.close();

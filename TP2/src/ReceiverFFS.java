@@ -72,7 +72,7 @@ class ReceiverFFS implements Runnable {
             return new Packet(2, InetAddress.getLocalHost().getHostAddress(), ipGateway, 8888, portaGateway, p.getIdUser(), 0, data.getBytes(StandardCharsets.UTF_8)); // Se encontrar o ficheiro devolver tipo 2 e na data vai o ficheiro
         }
         else
-            return new Packet(3,InetAddress.getLocalHost().getHostAddress(),ipGateway,8888,portaGateway,p.getIdUser(),0,"Ficheiro Nao Encontrado".getBytes(StandardCharsets.UTF_8));// Se não encontrar o ficheiro devolver tipo 3 e na data vai uma mensagem de erro
+            return new Packet(3,InetAddress.getLocalHost().getHostAddress(),ipGateway,8888,portaGateway,p.getIdUser(),0, p.getData());// Se não encontrar o ficheiro devolver tipo 3 e na data vai uma mensagem de erro
     }
 
     public Packet packetType4(Packet p) throws IOException {
