@@ -1,17 +1,20 @@
 import java.io.*;
 import java.net.*;
 import java.nio.charset.StandardCharsets;
+import java.util.Set;
 
 class FragmentsRequester implements Runnable {
     private PacketQueue queue;
     private ServerList servers;
+    private UserList users;
     private int idUser;
     private int nrChuncks;
     private String filename;
 
-    public FragmentsRequester(PacketQueue queue, ServerList servers, int idUser, int nrChuncks, String filename) {
+    public FragmentsRequester(PacketQueue queue, ServerList servers, UserList users, int idUser, int nrChuncks, String filename) {
         this.queue = queue;
         this.servers = servers;
+        this.users = users;
         this.idUser = idUser;
         this.nrChuncks = nrChuncks;
         this.filename = filename;
@@ -20,12 +23,20 @@ class FragmentsRequester implements Runnable {
     @Override
     public void run() {
         try {
-            Packet pnew;
+            boolean recievedAllPackages = false;
 
-            for(int i=0; i < nrChuncks; i++) {
-                ServerData sd = servers.getServer();
-                pnew = new Packet(4, InetAddress.getLocalHost().getHostAddress(), sd.getIp(), 8888, sd.getPort(), idUser, i, filename.getBytes(StandardCharsets.UTF_8));
-                queue.add(pnew);
+            while (!recievedAllPackages) {
+
+                Packet pnew;
+                Set<Integer> remaingFragments = users.getUserData(idUser).getRemaingFragments();
+
+                for (int i : remaingFragments) {
+                    ServerData sd = servers.getServer();
+                    pnew = new Packet(4, InetAddress.getLocalHost().getHostAddress(), sd.getIp(), 8888, sd.getPort(), idUser, i, filename.getBytes(StandardCharsets.UTF_8));
+                    queue.add(pnew);
+                }
+
+                recievedAllPackages = users.getUserData(idUser).noMoreFragments();
             }
         } catch (UnknownHostException e) {
             e.printStackTrace();
@@ -98,8 +109,10 @@ public class ReceiverGateway implements Runnable {
 
         users.setChunks(p.getIdUser(), chuncks);
 
+        users.addRemainingFragmentUser(p.getIdUser(), chuncks);
+
         // Criar um Thread para enviar os pedidos de Fragmentos
-        Thread fragmentsRequester = new Thread(new FragmentsRequester(queue, servers, p.getIdUser(), chuncks, tokens[0]));
+        Thread fragmentsRequester = new Thread(new FragmentsRequester(queue, servers, users, p.getIdUser(), chuncks, tokens[0]));
         fragmentsRequester.start();
 
         // Criar um Thread para verificar se ja recebeu os pacotes todos

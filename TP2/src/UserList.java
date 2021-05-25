@@ -1,13 +1,14 @@
 import java.net.Socket;
-import java.util.HashMap;
-import java.util.Map;
+import java.util.*;
 import java.util.concurrent.locks.Condition;
 import java.util.concurrent.locks.ReentrantLock;
+import java.util.stream.Collectors;
 
 class UserData {
     private int user_id;
     private Socket s;
     private int chuncks;
+    private Set<Integer> remainigFragments;
     private Map<Integer, Packet> fragments;
     private ReentrantLock lock;
     private Condition isFull;
@@ -16,6 +17,7 @@ class UserData {
         this.user_id = user_id;
         this.s = s;
         this.chuncks = 0;
+        this.remainigFragments = new TreeSet<>();
         this.fragments = new HashMap<>();
         this.lock = new ReentrantLock();
         this.isFull = lock.newCondition();
@@ -60,9 +62,40 @@ class UserData {
     public void addFragment(Packet p) {
         lock.lock();
         try {
-            fragments.put(p.getChucnkTransferencia(), p);
+            int chunck = p.getChucnkTransferencia();
 
+            fragments.put(chunck, p);
+            remainigFragments.remove(chunck);
+
+            if(fragments.size() == chuncks)
                 isFull.signalAll();
+        } finally {
+            lock.unlock();
+        }
+    }
+
+    public void addRemainingFragment (int chunck) {
+        lock.lock();
+        try {
+            remainigFragments.add(chunck);
+        } finally {
+            lock.unlock();
+        }
+    }
+
+    public Set<Integer> getRemaingFragments () {
+        lock.lock();
+        try {
+            return new TreeSet<>(remainigFragments);
+        } finally {
+            lock.unlock();
+        }
+    }
+
+    public boolean noMoreFragments () {
+        lock.lock();
+        try {
+            return remainigFragments.isEmpty();
         } finally {
             lock.unlock();
         }
@@ -149,6 +182,16 @@ public class UserList {
         lock.lock();
         try {
             return users.get(i);
+        } finally {
+            lock.unlock();
+        }
+    }
+
+    public void addRemainingFragmentUser(int i, int nrChunks) {
+        lock.lock();
+        try {
+            for (int n = 0; n < nrChunks; n++)
+                users.get(i).addRemainingFragment(i);
         } finally {
             lock.unlock();
         }
