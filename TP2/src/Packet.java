@@ -41,7 +41,7 @@ public class Packet implements Serializable {
 
     public Packet (byte[] conteudo) throws UnknownHostException {
         byte[] arrayBytes;
-        arrayBytes = decrypt(conteudo, InetAddress.getLocalHost().getHostAddress());
+        arrayBytes = decrypt(conteudo, "coninha");//InetAddress.getLocalHost().getHostAddress());
 
         byte[] auxiliar = new byte[4];
 
@@ -84,7 +84,7 @@ public class Packet implements Serializable {
         System.arraycopy(chucnkTransferencia,0,pacoteEmBytes,24,4);
         System.arraycopy(this.data,0,pacoteEmBytes,28,this.data.length);
 
-        return encrypt(pacoteEmBytes, this.ipDestino);
+        return encrypt(pacoteEmBytes, "coninha"); //this.ipDestino);
     }
 
 
