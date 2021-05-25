@@ -41,7 +41,7 @@ class PacketQueue {
             while (packets.isEmpty())
                 con.await();
 
-            return packets.remove();
+            return packets.isEmpty() ? null : packets.remove();
         } finally {
             lock.unlock();
         }
@@ -51,6 +51,15 @@ class PacketQueue {
         lock.lock();
         try {
             return packets.isEmpty();
+        } finally {
+            lock.unlock();
+        }
+    }
+
+    public void signalCon() {
+        lock.lock();
+        try {
+            con.signalAll();
         } finally {
             lock.unlock();
         }

@@ -8,7 +8,7 @@ import java.nio.charset.StandardCharsets;
 public class FFServer {
     public static boolean EXIT = false;
 
-    public static void main(String[] args) throws IOException {
+    public static void main(String[] args) throws IOException, InterruptedException {
         DatagramSocket ds = new DatagramSocket(8888);
         PacketQueue pq = new PacketQueue();
 
@@ -31,5 +31,9 @@ public class FFServer {
 
         Packet pacoteEncerrarLigacao = new Packet(7, InetAddress.getLocalHost().getHostAddress(), ipGateway, 8888, portaGateway, -1, 1, "FFs ira encerrar ligacao estabelecida".getBytes(StandardCharsets.UTF_8));
         pq.addFirst(pacoteEncerrarLigacao);
+
+        Thread.sleep(1000);
+
+        pq.signalCon();
     }
 }

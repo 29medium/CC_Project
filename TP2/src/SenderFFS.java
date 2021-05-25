@@ -24,10 +24,12 @@ class SenderFFS implements Runnable {
             try {
                 Packet p = pq.remove();
 
-                byte[] buf = p.packetToBytes();
-                DatagramPacket dp = new DatagramPacket(buf, buf.length, InetAddress.getByName(p.getIpDestino()), p.getPortaDestino());
+                if(!FFServer.EXIT) {
+                    byte[] buf = p.packetToBytes();
+                    DatagramPacket dp = new DatagramPacket(buf, buf.length, InetAddress.getByName(p.getIpDestino()), p.getPortaDestino());
 
-                ds.send(dp);
+                    ds.send(dp);
+                }
             } catch (IOException | InterruptedException ignored) {}
         }
     }
