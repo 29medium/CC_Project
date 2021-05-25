@@ -1,8 +1,6 @@
-import javax.crypto.BadPaddingException;
-import javax.crypto.Cipher;
-import javax.crypto.IllegalBlockSizeException;
-import javax.crypto.NoSuchPaddingException;
+import javax.crypto.*;
 import javax.crypto.spec.SecretKeySpec;
+import java.io.DataOutputStream;
 import java.io.Serializable;
 import java.io.UnsupportedEncodingException;
 import java.net.InetAddress;
@@ -11,10 +9,13 @@ import java.nio.ByteBuffer;
 import java.nio.charset.StandardCharsets;
 import java.security.InvalidKeyException;
 import java.security.NoSuchAlgorithmException;
+import java.util.Arrays;
 
 public class Packet implements Serializable {
     public static final int MAX_SIZE_DATA = 4096;
     public static final int MAX_SIZE_PACKET = MAX_SIZE_DATA + 28;
+    public static final String ENCRIPTION_KEY = "palavra_pass_muito_segura";
+
     // 1 - Pergunta aos FFs se ficheiro existe | 2 - Responde que possui o ficheiro       | 3 - Responde que ficheiro nao existe
     // 4 - Pede ao FFs um ficheiro que possui  | 5 - Envia o ficheiro requisitado
     // 6 - FFs informa que se pretende ligar   | 7 - FFs informa que se pretende desligar | 8 - Gateway informa que FSs se ligou corretamente
@@ -41,7 +42,7 @@ public class Packet implements Serializable {
 
     public Packet (byte[] conteudo) throws UnknownHostException {
         byte[] arrayBytes;
-        arrayBytes = decrypt(conteudo, "coninha");//InetAddress.getLocalHost().getHostAddress());
+        arrayBytes = decrypt(conteudo);
 
         byte[] auxiliar = new byte[4];
 
@@ -84,7 +85,8 @@ public class Packet implements Serializable {
         System.arraycopy(chucnkTransferencia,0,pacoteEmBytes,24,4);
         System.arraycopy(this.data,0,pacoteEmBytes,28,this.data.length);
 
-        return encrypt(pacoteEmBytes, "coninha"); //this.ipDestino);
+        System.out.println(Arrays.toString(encrypt(pacoteEmBytes)));
+        return encrypt(pacoteEmBytes);
     }
 
 
@@ -145,22 +147,22 @@ public class Packet implements Serializable {
         return new String(data, StandardCharsets.UTF_8);
     }
 
-    private byte[] encrypt(byte[] message, String key) {
+    private byte[] encrypt(byte[] message) {
         try {
-            Cipher cipher = Cipher.getInstance("AES/CBC/PKCS5Padding");
-            SecretKeySpec secretKey = new SecretKeySpec(key.getBytes("UTF-8"), "AES");
+            Cipher cipher = Cipher.getInstance("AES");
+            SecretKeySpec secretKey = new SecretKeySpec(ENCRIPTION_KEY.getBytes(StandardCharsets.UTF_8), "AES");
             cipher.init(Cipher.ENCRYPT_MODE, secretKey);
-            return cipher.doFinal(message);
+            return cipher.doFinal(message, 0, message.length);
         } catch (Exception ignored) { }
         return null;
     }
 
-    private byte[] decrypt(byte[] message, String key) {
+    private byte[] decrypt(byte[] message) {
         try {
-            Cipher cipher = Cipher.getInstance("AES/CBC/PKCS5Padding");
-            SecretKeySpec secretKey = new SecretKeySpec(key.getBytes("UTF-8"), "AES");
+            Cipher cipher = Cipher.getInstance("AES");
+            SecretKeySpec secretKey = new SecretKeySpec(ENCRIPTION_KEY.getBytes(StandardCharsets.UTF_8), "AES");
             cipher.init(Cipher.DECRYPT_MODE, secretKey);
-            return cipher.doFinal(message);
+            return cipher.doFinal(message, 0, message.length);
         } catch (Exception ignored) { }
         return null;
     }

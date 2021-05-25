@@ -110,6 +110,9 @@ public class ServerList {
     public ServerData getServer() {
         lock.lock();
         try {
+            if(servers.size()==0)
+                return null;
+
             ServerData res = (ServerData) servers.values().toArray()[nextServer];
             nextServer = (nextServer + 1) % servers.size();
             return res;
