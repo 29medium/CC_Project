@@ -11,7 +11,7 @@ public class Gateway {
         UserList users = new UserList();
         int userCounter=0; // cada user vai ter um id para guardar na userlist
 
-        System.out.println("Gateway conectou-se com o IP: " + Arrays.toString(InetAddress.getLocalHost().getAddress()) + "\n");
+        System.out.println("Gateway conectou-se com o IP: " + InetAddress.getLocalHost().getAddress() + "\n");
 
         // Thread para receber do FFS
         Thread receiver = new Thread(new ReceiverGateway(ds, servers, queue, users));
@@ -30,7 +30,6 @@ public class Gateway {
             BufferedReader in = new BufferedReader(new InputStreamReader(s.getInputStream()));
 
             String userPacket = in.readLine();
-            System.out.println(userPacket);
             String[] tokens = userPacket.split(" ");
 
             ServerData sd = servers.getServer();

@@ -23,6 +23,8 @@ public class BeaconFFS implements Runnable{
             try {
                 pq.addFirst(new Packet(9, InetAddress.getLocalHost().getHostAddress(), ipGateway, 8888, portaGateway, -1, 0, "I'm Alive".getBytes(StandardCharsets.UTF_8)));
 
+                System.out.println("Beacon enviado\n");
+
                 Thread.sleep(SLEEP_TIME);
             } catch (UnknownHostException | InterruptedException e) {}
         }

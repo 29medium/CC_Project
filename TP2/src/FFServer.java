@@ -16,7 +16,7 @@ public class FFServer {
         String ipGateway = args[0];
         int portaGateway = Integer.parseInt(args[1]);
 
-        System.out.println("FFS conectou-se com o IP: " + Arrays.toString(InetAddress.getLocalHost().getAddress()) + "\n");
+        System.out.println("FFS conectou-se com o IP: " + InetAddress.getLocalHost().getAddress() + "\n");
 
         Thread receiver = new Thread(new ReceiverFFS(ds, pq, ipGateway, portaGateway));
         Thread sender = new Thread(new SenderFFS(ds, pq));

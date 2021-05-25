@@ -35,8 +35,6 @@ class ReceiverFFS implements Runnable {
 		        System.arraycopy(dp.getData(), 0, conteudoPacote, 0, dp.getLength());
                 Packet p = new Packet(conteudoPacote); // Cria um pacote com as merdas recebidas do gateway
 
-                System.out.println(p.toString());
-
                 Packet newp;
                 switch (p.getTipo()) {
                     case 1:
