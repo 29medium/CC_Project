@@ -1,9 +1,37 @@
-import java.io.BufferedWriter;
-import java.io.DataOutputStream;
-import java.io.IOException;
-import java.io.OutputStreamWriter;
+import java.io.*;
 import java.net.*;
 import java.nio.charset.StandardCharsets;
+
+class FragmentsRequester implements Runnable {
+    private PacketQueue queue;
+    private ServerList servers;
+    private int idUser;
+    private int nrChuncks;
+    private String filename;
+
+    public FragmentsRequester(PacketQueue queue, ServerList servers, int idUser, int nrChuncks, String filename) {
+        this.queue = queue;
+        this.servers = servers;
+        this.idUser = idUser;
+        this.nrChuncks = nrChuncks;
+        this.filename = filename;
+    }
+
+    @Override
+    public void run() {
+        try {
+            Packet pnew;
+
+            for(int i=0; i < nrChuncks; i++) {
+                ServerData sd = servers.getServer();
+                pnew = new Packet(4, InetAddress.getLocalHost().getHostAddress(), sd.getIp(), 8888, sd.getPort(), idUser, i, filename.getBytes(StandardCharsets.UTF_8));
+                queue.add(pnew);
+            }
+        } catch (UnknownHostException e) {
+            e.printStackTrace();
+        }
+    }
+}
 
 public class ReceiverGateway implements Runnable {
     private DatagramSocket ds;
@@ -70,14 +98,11 @@ public class ReceiverGateway implements Runnable {
 
         users.setChunks(p.getIdUser(), chuncks);
 
-        Packet pnew;
-        for(int i=0; i<chuncks; i++) {
-            ServerData sd = servers.getServer();
-            pnew = new Packet(4, InetAddress.getLocalHost().getHostAddress(), sd.getIp(), 8888, sd.getPort(), p.getIdUser(), i, tokens[0].getBytes());
-            queue.add(pnew);
-        }
+        // Criar um Thread para enviar os pedidos de Fragmentos
+        Thread fragmentsRequester = new Thread(new FragmentsRequester(queue, servers, p.getIdUser(), chuncks, tokens[0]));
+        fragmentsRequester.start();
 
-        // Criar um thread para verificar se ja recebeu os pacotes todos
+        // Criar um Thread para verificar se ja recebeu os pacotes todos
         Thread userFileSender = new Thread(new UserFileSender(users, p.getIdUser()));
         userFileSender.start();
     }
